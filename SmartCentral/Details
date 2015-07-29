@@ -1,0 +1,61 @@
+Mnemonic        Name                Description
+MSGID   Message ID                  Field This field holds a 16 bit value used as a unique
+                                    message identifier.
+MSGTYP Message Type Field           This field holds an 8 bit value used to identify the
+                                    message type.
+                                    The decoding is shown below.
+                                    00. System Message
+                                    01. Hardware Message
+                                    02. Information Message
+                                    03. Acknowledgement Message
+                                    *All other values are unsupported.
+￼
+VCSID  Virtual Control System ID Field This field holds a 8 bit value identifying the targeted VCS
+NODEID
+Node Foreman ID Field
+This 8 bit field is used to identify the targeted Node Foreman. This field is only used in Hardware Messages.
+￼
+HRDWID
+Hardware Component ID
+￼
+The byte wide field is used to identify the targeted hardware module to which the command is intended.
+CMDTYP
+Command Type Field
+This field holds an 8 bit value identifying the command type. The command type decoding is shown below.
+00. No Op
+01. Set Command 02. Get Command 03. Action Command
+*All other values are unsupported.
+CMD
+￼
+Command Field
+This field holds an 8 bit command identifier. Commands differ from one VCS to another; therefore two VCSs may share the same command for two different commands.
+￼￼￼
+￼
+CMDPKT
+￼
+Command Packet Field
+This field holds the necessary command packet which holds the parameters for command processing; the length of this field is determined by the specific command, and is terminated by 3 end of transmission characters.
+PRI
+Priority Field
+This is an 8 bit field which contains the message priority indication. A decoding for the message priority is shown below; priority severity is listed in descending order.
+00. Critical Highest Priority, Sev1. 01. Very Important, Sev2.
+02. Moderate Importance, Sev3. 03. Low Importance, Sev4.
+*All other values are unsupported.
+ACKTYP
+￼
+￼
+Acknowledgement Type Field
+This 8 bit field identifies the message as either an acknowledgement or a rejection; the decoding is shown below.
+0. Rejection
+1. Acknowledgement
+*All other values are unsupported.
+MSGRESP
+Message Response Field
+All messages must receive an acknowledgement. This MSGRESP field holds either the reason for a rejection or the requested information (if any) from the associated system or hardware message. This field has an indeterminate length and is terminated by three "end of transmission" characters.
+STATMSG
+Status & Information Field
+This field holds information transmitted by a Node Foreman from a specific VCS to the I2UI. The information held in this field must have known significance to the I2UI or the user. This field has an indeterminate length and is terminated by three “end of transmission” characters.
+TIMSTMP
+Time Stamp Field
+￼
+This field holds the 32 bit time stamp value.
