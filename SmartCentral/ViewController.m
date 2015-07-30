@@ -9,6 +9,8 @@
 #import "ViewController.h"
 #import "MelodyManager.h"
 
+#define NOTIFY_MTU      20
+
 @interface ViewController () <MelodyManagerDelegate,MelodySmartDelegate,UITextFieldDelegate>{
     MelodyManager *melodyManager;
     NSMutableArray *_objects;
@@ -18,6 +20,8 @@
 @property (weak, nonatomic) IBOutlet UITextView *degubInfoTextView;
 @property (weak, nonatomic) IBOutlet UITextField *commandTextField;
 @property (strong, nonatomic) MelodySmart *melodySmart;
+@property (strong, nonatomic) NSData                    *dataToSend;
+@property (nonatomic, readwrite) NSInteger              sendDataIndex;
 @end
 
 @implementation ViewController
@@ -96,7 +100,7 @@
 }
 #pragma mark - Smart Melody Delegates-
 -(void)melodySmart:(MelodySmart *)melody didSendData:(NSError *)error {
-    
+    [self sendDataToMelody];
 }
 - (void)melodySmart:(MelodySmart *)melody didConnectToMelody:(BOOL)result {
     NSLog(@"didConnectToMelody");
@@ -140,6 +144,7 @@
 }
 -(BOOL)textFieldShouldReturn:(UITextField *)textField {
 //    [_melodySmart sendRemoteCommand:self.commandTextField.text];
+    
     NSData* data = [self.commandTextField.text dataUsingEncoding:NSUTF8StringEncoding];
     if([self.melodySmart sendData:data]){
         if (str == nil) {
@@ -379,7 +384,7 @@ NSTimer *rssiTimer;
  NDFRMN_1: 0xFD
  ----
  SYS_MSG: 0xB0
- SYS_MSG: 0xB0
+ HDWR_MSG: 0xB1
  INFO_MSG: 0xB2
  ￼ACT_MSG: 0xB3
  --------
@@ -432,8 +437,19 @@ NSTimer *rssiTimer;
     GetDate:0x0A
     Desc: This command retrieves the current date for the Navigation VCS
     Type:  Get
-     */
+     H/w meg format: MSGID|MSGTYP| ￼NODEID|HRWDID|CMDTYPE|CMD|CMDPKT|￼PRI|TIMSTMP
+          */
     
+    time_t unixTime = (time_t) [[NSDate date] timeIntervalSince1970];
+    NSString *hexTimeStamp = [NSString stringWithFormat:@"0x%lX",
+                     (unsigned long)unixTime];
+    NSLog(@"%@", hexTimeStamp);
+    NSString *cmdData = [NSString stringWithFormat:@"SEND 0x00010xA10xFD|?|0xB10x0A0x01010404040x01%@",hexTimeStamp];
+    self.dataToSend = [cmdData dataUsingEncoding:NSUTF8StringEncoding];
+    self.commandTextField.text = cmdData;
+    self.sendDataIndex = 0;
+    [self.commandTextField resignFirstResponder];
+    [self sendDataToMelody];
 }
 - (IBAction)setHeadLightON:(id)sender {
     /*
@@ -453,5 +469,48 @@ NSTimer *rssiTimer;
     */
 }
 - (IBAction)setFrontCamModeStill:(id)sender {
+}
+-(void)sendDataToMelody{
+    
+    
+//    self.commandTextField.text = cmd;
+    if (self.sendDataIndex >= self.dataToSend.length) {
+        
+        // No data left.  Do nothing
+        return;
+    }
+    
+    // Work out how big it should be
+    NSInteger amountToSend = self.dataToSend.length - self.sendDataIndex;
+    
+    // Can't be longer than 20 bytes
+    if (amountToSend > NOTIFY_MTU) amountToSend = NOTIFY_MTU;
+    
+    // Copy out the data we want
+    NSData *chunk = [NSData dataWithBytes:self.dataToSend.bytes+self.sendDataIndex length:amountToSend];
+    BOOL didSend = [self.melodySmart sendData:chunk];
+    
+    // If it didn't work, drop out and wait for the callback
+    if(!didSend){
+        if (str == nil) {
+            str = [NSMutableString stringWithFormat:@"%@\n", @"Not sent"];
+        } else {
+            [str appendFormat:@"%@\n", @"Not sent"];
+        }
+        self.degubInfoTextView.text =str;
+        return;
+    }
+    self.sendDataIndex += amountToSend;
+    NSString *stringFromData = [[NSString alloc] initWithData:chunk encoding:NSUTF8StringEncoding];
+    NSLog(@"Sent: %@", stringFromData);
+    if (str == nil) {
+        str = [NSMutableString stringWithFormat:@"%@\n", stringFromData];
+    } else {
+        [str appendFormat:@"%@\n", stringFromData];
+    }
+    self.degubInfoTextView.text =str;
+    // It did send, so update our index
+    
+    
 }
 @end

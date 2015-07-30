@@ -77,8 +77,7 @@
                                 <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 <state key="normal" title="HeadLit-On"/>
                                 <connections>
-                                    <action selector="setHeadLIghtON:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="tUf-n5-NAX"/>
-                                    <action selector="setHeadLightON:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="ugg-DY-Zqj"/>
+                                    <action selector="setHeadLightON:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="sQY-TB-cWe"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Nt5-JV-i3f">
@@ -148,7 +147,6 @@
                     </view>
                     <connections>
                         <outlet property="commandTextField" destination="N02-34-31k" id="ewU-r0-sXD"/>
-                        <outlet property="cyclingModeBtn" destination="kh9-bI-dsS" id="l2B-CA-8fw"/>
                         <outlet property="degubInfoTextView" destination="Iua-f2-cxv" id="zrz-aV-yn1"/>
                         <outlet property="scanBtn" destination="JeK-m4-wC6" id="66f-le-Ljo"/>
                     </connections>
