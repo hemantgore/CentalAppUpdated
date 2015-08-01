@@ -145,6 +145,12 @@
 -(BOOL)textFieldShouldReturn:(UITextField *)textField {
 //    [_melodySmart sendRemoteCommand:self.commandTextField.text];
     
+    self.dataToSend = [textField.text dataUsingEncoding:NSUTF8StringEncoding];
+//    self.commandTextField.text = cmdData;
+    self.sendDataIndex = 0;
+    [self.commandTextField resignFirstResponder];
+    [self sendDataToMelody];
+    
     NSData* data = [self.commandTextField.text dataUsingEncoding:NSUTF8StringEncoding];
     if([self.melodySmart sendData:data]){
         if (str == nil) {
@@ -276,51 +282,51 @@ NSTimer *rssiTimer;
     int total =ge +shi;
     return total;
 }
-- (IBAction)setCyclingMode:(id)sender{
-    
-    uint8_t send[] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    /*
-     4.3.1 System Message Format
-     MSGID|MSGTYP|NODEID|VCSID|CMDTYP||CMD||CMDPKT|PRI|TIMSTMP
-     */
-    //    uint8_t send[20];
-
-     NSString *hxStr = [self stringToHex:@"SEND"];
-    send[0] =[hxStr intValue];//[[NSString stringWithFormat:@"%ld", strtoul([@"send" UTF8String],0,16)] intValue];
-    send[1]=[self decimalIntoHex:1];
-    send[2]=0xB0;//MSG Type-0xB0:Sys, 0xB1:HW,0xB2:info, 0xB3:ACT
-    send[3]=0x00;//5 bit, used for H/w msg type: 0xFD
-    send[4]=0xC3;
-    send[5]=0xA0;//CMD type, 0xA0:SET, 0xA1:GET, 0xA2:ACT
-    send[6]=0xA0;//CMD,e,g: SetSysMod:0xEC
-    send[7]=0x01; // 0x01:Cycling
-    send[8]=0x01;//Priority: (0x01)in HEX==1 in Decimal
-    send[9]=[self decimalIntoHex:[[NSDate date] timeIntervalSince1970]];// Get Sencond in since, convert ot HEX
-    send[10] ='\r';//[self decimalIntoHex:[[NSString stringWithFormat:@"%ld", strtoul([@"\r" UTF8String],0,16)] intValue]];
-    NSData *data = [[NSData alloc] initWithBytes:send length:11];
-    if (bleShield.activePeripheral.state == CBPeripheralStateConnected) {
-        [bleShield write:data];
-        NSMutableString *temp = [[NSMutableString alloc] init];
-        for (int i = 0; i < 11; i++) {
-            
-//            NSString *strTmp = [NSString stringWithFormat:@"%x",send[i]];
-//            if([strTmp length]<2)
-//                [temp appendFormat:@" 0x0%x ", send[i]];
-//            else
-//            if(i==0){
-//                NSString *hexStr = [self ];
-//            }
-            
-                [temp appendFormat:@" 0x%0.2hhx ", send[i]];
-        }
-        if (str == nil) {
-            str = [NSMutableString stringWithFormat:@"%@\n", temp];
-        } else {
-            [str appendFormat:@"%@\n", temp];
-        }
-        self.degubInfoTextView.text =str;
-    }
-}
+//- (IBAction)setCyclingMode:(id)sender{
+//    
+//    uint8_t send[] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+//    /*
+//     4.3.1 System Message Format
+//     MSGID|MSGTYP|NODEID|VCSID|CMDTYP||CMD||CMDPKT|PRI|TIMSTMP
+//     */
+//    //    uint8_t send[20];
+//
+//     NSString *hxStr = [self stringToHex:@"SEND"];
+//    send[0] =[hxStr intValue];//[[NSString stringWithFormat:@"%ld", strtoul([@"send" UTF8String],0,16)] intValue];
+//    send[1]=[self decimalIntoHex:1];
+//    send[2]=0xB0;//MSG Type-0xB0:Sys, 0xB1:HW,0xB2:info, 0xB3:ACT
+//    send[3]=0x00;//5 bit, used for H/w msg type: 0xFD
+//    send[4]=0xC3;
+//    send[5]=0xA0;//CMD type, 0xA0:SET, 0xA1:GET, 0xA2:ACT
+//    send[6]=0xA0;//CMD,e,g: SetSysMod:0xEC
+//    send[7]=0x01; // 0x01:Cycling
+//    send[8]=0x01;//Priority: (0x01)in HEX==1 in Decimal
+//    send[9]=[self decimalIntoHex:[[NSDate date] timeIntervalSince1970]];// Get Sencond in since, convert ot HEX
+//    send[10] ='\r';//[self decimalIntoHex:[[NSString stringWithFormat:@"%ld", strtoul([@"\r" UTF8String],0,16)] intValue]];
+//    NSData *data = [[NSData alloc] initWithBytes:send length:11];
+//    if (bleShield.activePeripheral.state == CBPeripheralStateConnected) {
+//        [bleShield write:data];
+//        NSMutableString *temp = [[NSMutableString alloc] init];
+//        for (int i = 0; i < 11; i++) {
+//            
+////            NSString *strTmp = [NSString stringWithFormat:@"%x",send[i]];
+////            if([strTmp length]<2)
+////                [temp appendFormat:@" 0x0%x ", send[i]];
+////            else
+////            if(i==0){
+////                NSString *hexStr = [self ];
+////            }
+//            
+//                [temp appendFormat:@" 0x%0.2hhx ", send[i]];
+//        }
+//        if (str == nil) {
+//            str = [NSMutableString stringWithFormat:@"%@\n", temp];
+//        } else {
+//            [str appendFormat:@"%@\n", temp];
+//        }
+//        self.degubInfoTextView.text =str;
+//    }
+//}
 - (IBAction)setLED:(UISwitch*)sender{
     
     uint8_t send[] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
@@ -393,26 +399,10 @@ NSTimer *rssiTimer;
  ACT: 0xA2
  -----
  4.3.1 System Message Format
- MSGID
- MSGTYP
- ￼NODEID
- ￼VCSID
- CMDTYP
- ￼CMD
- CMDPKT
- ￼￼PRI
- TIMSTMP
+ Sys msg format: MSGID| MSGTYP|￼NODEID|VCSID|CMDTYP|CMD|CMDPKT|￼￼PRI|TIMSTMP
  
  4.3.2 Hardware Message Format
- MSGID
- MSGTYP
- ￼NODEID
- HRWDID
- CMDTYPE
- ￼￼CMD
- CMDPKT
- ￼PRI
- TIMSTMP
+ H/w meg format: MSGID|MSGTYP| ￼NODEID|HRWDID|CMDTYPE|CMD|CMDPKT|￼PRI|TIMSTMP
  
  4.3.3 Informational Message Format
  MSGID
@@ -437,14 +427,11 @@ NSTimer *rssiTimer;
     GetDate:0x0A
     Desc: This command retrieves the current date for the Navigation VCS
     Type:  Get
-     H/w meg format: MSGID|MSGTYP| ￼NODEID|HRWDID|CMDTYPE|CMD|CMDPKT|￼PRI|TIMSTMP
-          */
+
+     Sys msg format: MSGID| MSGTYP|￼NODEID|VCSID|CMDTYP|CMD|CMDPKT|￼￼PRI|TIMSTMP
+    */
     
-    time_t unixTime = (time_t) [[NSDate date] timeIntervalSince1970];
-    NSString *hexTimeStamp = [NSString stringWithFormat:@"0x%lX",
-                     (unsigned long)unixTime];
-    NSLog(@"%@", hexTimeStamp);
-    NSString *cmdData = [NSString stringWithFormat:@"SEND 0x00010xA10xFD|?|0xB10x0A0x01010404040x01%@",hexTimeStamp];
+    NSString *cmdData = [NSString stringWithFormat:@"SEND 0x0001 0xA1 0xFD 0xC0 0x0A 0x0101040404 0x01%@",[self getcurrentHexTimestamp]];
     self.dataToSend = [cmdData dataUsingEncoding:NSUTF8StringEncoding];
     self.commandTextField.text = cmdData;
     self.sendDataIndex = 0;
@@ -470,6 +457,68 @@ NSTimer *rssiTimer;
 }
 - (IBAction)setFrontCamModeStill:(id)sender {
 }
+//System msgs
+- (IBAction)setSysMode:(id)sender {
+    UIButton *btn = (UIButton*)sender;
+    NSString *cmdData;// = [NSString stringWithFormat:@"SEND 0x0001 0xB0 0xFD 0xC0 0x0A 0x0101040404 0x01%@",[self getcurrentHexTimestamp]];
+    switch (btn.tag) {
+        case 301://Cycling
+        {
+            cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0x0A 0xEC 0x0101040404 0x01%@",[self getcurrentHexTimestamp]];
+            break;
+        }
+        case 302://Motosport
+        {
+            cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0x0A 0xEC 0x0102040404 0x01%@",[self getcurrentHexTimestamp]];
+            break;
+        }
+        case 303://Wintersport
+        {
+            cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0x0A 0xEC 0x0103040404 0x01%@",[self getcurrentHexTimestamp]];
+            break;
+        }
+        case 304://Longboarding
+        {
+            cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0x0A 0xEC 0x0104040404 0x01%@",[self getcurrentHexTimestamp]];
+            break;
+        }
+        case 305://Debug
+        {
+            cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0x0A 0xEC 0x0105040404 0x01%@",[self getcurrentHexTimestamp]];
+            break;
+        }
+        case 401://Stunt
+        {
+            cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0x0A 0xEB 0x0101040404 0x01%@",[self getcurrentHexTimestamp]];
+            break;
+        }
+        case 402://Race
+        {
+            cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0x0A 0xEB 0x0102040404 0x01%@",[self getcurrentHexTimestamp]];
+            break;
+        }
+        case 403://Commute
+        {
+            cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0x0A 0xEB 0x0103040404 0x01%@",[self getcurrentHexTimestamp]];
+            break;
+        }
+        default:
+            break;
+    }
+    cmdData = [cmdData stringByReplacingOccurrencesOfString:@" " withString:@""];
+    cmdData = [NSString stringWithFormat:@"SEND %@",cmdData];
+    self.dataToSend = [cmdData dataUsingEncoding:NSUTF8StringEncoding];
+    self.commandTextField.text = cmdData;
+    self.sendDataIndex = 0;
+    [self.commandTextField resignFirstResponder];
+    [self sendDataToMelody];
+}
+
+- (IBAction)clearDebugArea:(id)sender {
+    str = nil;
+    self.degubInfoTextView.text =@"";
+}
+
 -(void)sendDataToMelody{
     
     
@@ -512,5 +561,12 @@ NSTimer *rssiTimer;
     // It did send, so update our index
     
     
+}
+-(NSString*)getcurrentHexTimestamp{
+    time_t unixTime = (time_t) [[NSDate date] timeIntervalSince1970];
+    NSString *hexTimeStamp = [NSString stringWithFormat:@"0x%lX",
+                              (unsigned long)unixTime];
+    NSLog(@"%@", hexTimeStamp);
+    return hexTimeStamp;
 }
 @end
