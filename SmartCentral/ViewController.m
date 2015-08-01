@@ -126,9 +126,9 @@
 -(void)melodySmart:(MelodySmart *)melody didReceiveData:(NSData *)data {
     NSString *temp =[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     if (str == nil) {
-        str = [NSMutableString stringWithFormat:@"%@\n", temp];
+        str = [NSMutableString stringWithFormat:@"Recieved: %@\n", temp];
     } else {
-        [str appendFormat:@"%@\n", temp];
+        [str appendFormat:@"Recieved: %@\n", temp];
     }
     self.degubInfoTextView.text =str;
     
@@ -151,25 +151,25 @@
     [self.commandTextField resignFirstResponder];
     [self sendDataToMelody];
     
-    NSData* data = [self.commandTextField.text dataUsingEncoding:NSUTF8StringEncoding];
-    if([self.melodySmart sendData:data]){
-        if (str == nil) {
-            str = [NSMutableString stringWithFormat:@"%@\n", self.commandTextField.text];
-        } else {
-            [str appendFormat:@"%@\n", self.commandTextField.text];
-        }
-    }else{
-        if (str == nil) {
-            str = [NSMutableString stringWithFormat:@"Error in sending data\n"];
-        } else {
-            [str appendFormat:@"Error in sending data\n"];
-        }
-    }
-    
-    [self.commandTextField resignFirstResponder];
-    
-    
-    self.degubInfoTextView.text =str;
+//    NSData* data = [self.commandTextField.text dataUsingEncoding:NSUTF8StringEncoding];
+//    if([self.melodySmart sendData:data]){
+//        if (str == nil) {
+//            str = [NSMutableString stringWithFormat:@"%@\n", self.commandTextField.text];
+//        } else {
+//            [str appendFormat:@"%@\n", self.commandTextField.text];
+//        }
+//    }else{
+//        if (str == nil) {
+//            str = [NSMutableString stringWithFormat:@"Error in sending data\n"];
+//        } else {
+//            [str appendFormat:@"Error in sending data\n"];
+//        }
+//    }
+//    
+//    [self.commandTextField resignFirstResponder];
+//    
+//    
+//    self.degubInfoTextView.text =str;
     return YES;
 }
 
@@ -469,37 +469,37 @@ NSTimer *rssiTimer;
         }
         case 302://Motosport
         {
-            cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0x0A 0xEC 0x0102040404 0x01%@",[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0x0A 0xEC 0x0102040404 0x01%@",[self getcurrentHexTimestamp]];
             break;
         }
         case 303://Wintersport
         {
-            cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0x0A 0xEC 0x0103040404 0x01%@",[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0003 0xB0 0xFD 0xC3 0x0A 0xEC 0x0103040404 0x01%@",[self getcurrentHexTimestamp]];
             break;
         }
         case 304://Longboarding
         {
-            cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0x0A 0xEC 0x0104040404 0x01%@",[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0004 0xB0 0xFD 0xC3 0x0A 0xEC 0x0104040404 0x01%@",[self getcurrentHexTimestamp]];
             break;
         }
         case 305://Debug
         {
-            cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0x0A 0xEC 0x0105040404 0x01%@",[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0005 0xB0 0xFD 0xC3 0x0A 0xEC 0x0105040404 0x01%@",[self getcurrentHexTimestamp]];
             break;
         }
         case 401://Stunt
         {
-            cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0x0A 0xEB 0x0101040404 0x01%@",[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0006 0xB0 0xFD 0xC3 0x0A 0xEB 0x0101040404 0x01%@",[self getcurrentHexTimestamp]];
             break;
         }
         case 402://Race
         {
-            cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0x0A 0xEB 0x0102040404 0x01%@",[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0007 0xB0 0xFD 0xC3 0x0A 0xEB 0x0102040404 0x01%@",[self getcurrentHexTimestamp]];
             break;
         }
         case 403://Commute
         {
-            cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0x0A 0xEB 0x0103040404 0x01%@",[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0008 0xB0 0xFD 0xC3 0x0A 0xEB 0x0103040404 0x01%@",[self getcurrentHexTimestamp]];
             break;
         }
         default:
