@@ -13,16 +13,17 @@
 static void (^__scanBlock)(NSError *error);
 static void (^__connectBlock)(NSError *error);
 static void (^__disconnectBlock)(NSError *error);
+static void (^__commandCompletionBlock)(NSError *error);
 
 @interface SmartBLEManager ()<MelodyManagerDelegate,MelodySmartDelegate>
 {
      MelodyManager *melodyManager;
      NSMutableArray *_objects;
 }
-@property (strong, nonatomic) MelodySmart *melodySmart;
-@property (strong, nonatomic) NSData                    *dataToSend;
-@property (nonatomic, readwrite) NSInteger              sendDataIndex;
-
+@property (strong,    nonatomic)    MelodySmart  *melodySmart;
+@property (strong,    nonatomic)    NSData       *dataToSend;
+@property (nonatomic, readwrite)    NSInteger    sendDataIndex;
+@property (nonatomic, assign)       BOOL         isPowerOn;
 @end
 @implementation SmartBLEManager
 #pragma mark - Singleton Methods -
@@ -45,7 +46,7 @@ static void (^__disconnectBlock)(NSError *error);
     }
     return self;
 }
-- (void)scanSmartHelmet:(void(^)(NSError *error)) scanBlock {
+- (void)scanSmartHelmet:(void(^)(NSError *error))scanBlock {
     __scanBlock = scanBlock;
     [self clearObjects];
     [melodyManager scanForMelody];
@@ -55,8 +56,11 @@ static void (^__disconnectBlock)(NSError *error);
 - (void)connectToDefaultSmartHelmet:(void(^)(NSError *error))connectBlock {
     __connectBlock = connectBlock;
     
-   self.melodySmart.delegate = self;
-    [self.melodySmart connect];
+    self.melodySmart = [_objects count]?_objects[0]:nil;
+    if(self.melodySmart!=nil){
+        self.melodySmart.delegate = self;
+        [self.melodySmart connect];
+    }
 }
 - (void)disconnectSmartHelmet:(void(^)(NSError *error))disconnectBlock
 {
@@ -69,9 +73,11 @@ static void (^__disconnectBlock)(NSError *error);
     
     if(self.melodySmart!=nil)
     {
-        __scanBlock(nil);
+        if(__scanBlock) __scanBlock(nil);
         
     }else{
+        NSError *err = [NSError errorWithDomain:@"" code:-1001 userInfo:[NSDictionary dictionaryWithObject:@"No SmartHelmet found. Check if SmartHelmet is Power ON and search again." forKey:NSLocalizedDescriptionKey]];
+        if(__scanBlock) __scanBlock(err);
         
 //        if (str == nil) {
 //            str = [NSMutableString stringWithFormat:@"No BLE found \n"];
@@ -99,55 +105,30 @@ static void (^__disconnectBlock)(NSError *error);
 }
 - (void)melodySmart:(MelodySmart *)melody didConnectToMelody:(BOOL)result {
     NSLog(@"didConnectToMelody");
-
+    _isPowerOn = YES;
     if(__connectBlock){
-        NSError *err = result ? [NSError errorWithDomain:@"" code:-1001 userInfo:[NSDictionary dictionaryWithObject:@"Not able to connect to Smart Helmet" forKey:NSLocalizedDescriptionKey]] : nil;
+        NSError *err = result ? [NSError errorWithDomain:@"" code:-1001 userInfo:[NSDictionary dictionaryWithObject:@"Not able to connect to SmartHelmet" forKey:NSLocalizedDescriptionKey]] : nil;
         __connectBlock(err);
     }
-//    if (str == nil) {
-//        str = [NSMutableString stringWithFormat:@"Connected to %@\n",self.melodySmart.name];
-//    } else {
-//        [str appendFormat:@"Connected to %@\n",self.melodySmart.name];
-//    }
-//    self.degubInfoTextView.text =str;
 }
 -(void)melodySmartDidDisconnectFromMelody:(MelodySmart *)melody {
     NSLog(@"didDisconnectFromMelody");
     if(__disconnectBlock){
-        NSError *err = melody.isConnected ? [NSError errorWithDomain:@"" code:-1001 userInfo:[NSDictionary dictionaryWithObject:@"Not able to disconnect from Smart Helmet" forKey:NSLocalizedDescriptionKey]] : nil;
+        NSError *err = melody.isConnected ? [NSError errorWithDomain:@"" code:-1001 userInfo:[NSDictionary dictionaryWithObject:@"Not able to disconnect from SmartHelmet" forKey:NSLocalizedDescriptionKey]] : nil;
         __disconnectBlock(err);
     }
-//    if (str == nil) {
-//        str = [NSMutableString stringWithFormat:@"Disconnected \n"];
-//    } else {
-//        [str appendFormat:@"Disconnected\n"];
-//    }
-//    self.degubInfoTextView.text =str;
-    
 }
 -(void)melodySmart:(MelodySmart *)melody didReceiveData:(NSData *)data {
     NSString *temp =[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     NSLog(@"didReceivedData::%@",temp);
-//    if (str == nil) {
-//        str = [NSMutableString stringWithFormat:@"Recieved: %@\n", temp];
-//    } else {
-//        [str appendFormat:@"Recieved: %@\n", temp];
-//    }
-//    self.degubInfoTextView.text =str;
     
 }
 - (void)melodySmart:(MelodySmart *)melody didReceiveCommandReply:(NSData *)data {
     NSString *temp =[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     NSLog(@"didReceiveCommandReply::%@",temp);
-//    if (str == nil) {
-//        str = [NSMutableString stringWithFormat:@"%@\n", temp];
-//    } else {
-//        [str appendFormat:@"%@\n", temp];
-//    }
-//    self.degubInfoTextView.text =str;
 }
 
-#pragma mark MelodyManager delegate
+#pragma mark - MelodyManager delegate -
 
 -(void)melodyManagerDiscoveryDidRefresh:(MelodyManager *)manager {
     //    NSLog(@"discoveryDidRefresh");
@@ -157,24 +138,96 @@ static void (^__disconnectBlock)(NSError *error);
     
 }
 - (void) melodyManagerDiscoveryStatePoweredOff:(MelodyManager*)manager{
-    
+    _isPowerOn = NO;
+    //TODO: In PwrDwn: 0xBB, set it YES/NO accordingly
+
+}
+- (BOOL)isPowerOn{
+    return _isPowerOn;
 }
 - (void) melodyManagerConnectedListChanged{
     
 }
 #pragma mark - Send data to BLE -
+- (void) sendCommandToHelmet:(CMD_TYPE)cmd completion:(void(^) (NSError *error))cmdCompletion
+{
+    __commandCompletionBlock = cmdCompletion;
+    if(!_isPowerOn){
+        NSError *err = [NSError errorWithDomain:@"" code:-1001 userInfo:[NSDictionary dictionaryWithObject:@"Check if SmartHelmet is Power ON and try again." forKey:NSLocalizedDescriptionKey]];
+        __commandCompletionBlock(err);
+        return;
+    }
+    NSString *cmdData;
+    switch (cmd) {
+        case CMD_SET_CYCLING_MODE://Cycling
+        {
+            cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0x0A 0xEC 0x0101040404 0x01%@",[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_MOTOSPORT_MODE://Motosport
+        {
+            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0x0A 0xEC 0x0102040404 0x01%@",[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_WINTERSPORT_MODE://Wintersport
+        {
+            cmdData = [NSString stringWithFormat:@"0x0003 0xB0 0xFD 0xC3 0x0A 0xEC 0x0103040404 0x01%@",[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_LONGBOARDING_MODE://Longboarding
+        {
+            cmdData = [NSString stringWithFormat:@"0x0004 0xB0 0xFD 0xC3 0x0A 0xEC 0x0104040404 0x01%@",[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_DEBUG_MODE://Debug
+        {
+            cmdData = [NSString stringWithFormat:@"0x0005 0xB0 0xFD 0xC3 0x0A 0xEC 0x0105040404 0x01%@",[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_STUNT_MODE://Stunt
+        {
+            cmdData = [NSString stringWithFormat:@"0x0006 0xB0 0xFD 0xC3 0x0A 0xEB 0x0101040404 0x01%@",[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_RACE_MODE://Race
+        {
+            cmdData = [NSString stringWithFormat:@"0x0007 0xB0 0xFD 0xC3 0x0A 0xEB 0x0102040404 0x01%@",[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_COMMUTE_MODE://Commute
+        {
+            cmdData = [NSString stringWithFormat:@"0x0008 0xB0 0xFD 0xC3 0x0A 0xEB 0x0103040404 0x01%@",[self getcurrentHexTimestamp]];
+            break;
+        }
+        default:
+            break;
+    }
+    cmdData = [cmdData stringByReplacingOccurrencesOfString:@" " withString:@""];
+    cmdData = [NSString stringWithFormat:@"SEND %@",cmdData];
+    self.dataToSend = [cmdData dataUsingEncoding:NSUTF8StringEncoding];
+    //    self.commandTextField.text = cmdData;
+    self.sendDataIndex = 0;
+    
+    [self sendDataToMelody];
+    
+}
 -(void)sendDataToMelody{
     
     if (self.sendDataIndex >= self.dataToSend.length) {
         // No data left.  Do nothing
         return;
     }
-    
+    BOOL canCallCompletion = NO;
     // Work out how big it should be
     NSInteger amountToSend = self.dataToSend.length - self.sendDataIndex;
     
     // Can't be longer than 20 bytes
-    if (amountToSend > NOTIFY_MTU) amountToSend = NOTIFY_MTU;
+    if (amountToSend > NOTIFY_MTU){
+        amountToSend = NOTIFY_MTU;
+        canCallCompletion = NO;
+    }else{
+        canCallCompletion = YES;
+    }
     
     // Copy out the data we want
     NSData *chunk = [NSData dataWithBytes:self.dataToSend.bytes+self.sendDataIndex length:amountToSend];
@@ -188,7 +241,17 @@ static void (^__disconnectBlock)(NSError *error);
 //            [str appendFormat:@"%@\n", @"Not sent"];
 //        }
 //        self.degubInfoTextView.text =str;
+        //CallCompletion with Fail status
+        if(canCallCompletion && __commandCompletionBlock){
+            NSError *err=[NSError errorWithDomain:@"" code:-1001 userInfo:[NSDictionary dictionaryWithObject:@"Command not sent" forKey:NSLocalizedDescriptionKey]];
+            __commandCompletionBlock(err);
+        }
         return;
+    }else{
+            //CallCompletion with Fail status
+        if(canCallCompletion && __commandCompletionBlock){
+            __commandCompletionBlock(nil);
+        }
     }
     self.sendDataIndex += amountToSend;
     NSString *stringFromData = [[NSString alloc] initWithData:chunk encoding:NSUTF8StringEncoding];

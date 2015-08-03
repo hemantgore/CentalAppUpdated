@@ -8,12 +8,14 @@
 
 #import "ViewController.h"
 #import "MelodyManager.h"
+#import "SmartBLEManager.h"
 
 #define NOTIFY_MTU      20
 
 @interface ViewController () <MelodyManagerDelegate,MelodySmartDelegate,UITextFieldDelegate>{
     MelodyManager *melodyManager;
     NSMutableArray *_objects;
+    SmartBLEManager *smartManager;
 }
 @property (weak, nonatomic) IBOutlet UIButton *scanBtn;
 @property (strong, nonatomic) IBOutlet UIView *cyclingModeBtn;
@@ -35,10 +37,10 @@
 //    bleShield.delegate = self;
     
     //Melody Manager
-    melodyManager = [MelodyManager new];
-    [melodyManager setForService:nil andDataCharacterisitc:nil andPioReportCharacteristic:nil andPioSettingCharacteristic:nil];
-    melodyManager.delegate = self;
-
+//    melodyManager = [MelodyManager new];
+//    [melodyManager setForService:nil andDataCharacterisitc:nil andPioReportCharacteristic:nil andPioSettingCharacteristic:nil];
+//    melodyManager.delegate = self;
+    
     
 }
 - (void)viewDidAppear:(BOOL)animated {
@@ -49,13 +51,23 @@
 //    [melodyManager stopScanning];
 }
 - (void)scan {
-    [self clearObjects];
-    [melodyManager scanForMelody];
-    [self performSelector:@selector(stop) withObject:nil afterDelay:3.0];
-    [NSTimer scheduledTimerWithTimeInterval:(float)3.2 target:self selector:@selector(connectionTimer:) userInfo:nil repeats:NO];
+//    [self clearObjects];
+//    [melodyManager scanForMelody];
+//    [self performSelector:@selector(stop) withObject:nil afterDelay:3.0];
+//    [NSTimer scheduledTimerWithTimeInterval:(float)3.2 target:self selector:@selector(connectionTimer:) userInfo:nil repeats:NO];
+    [[SmartBLEManager sharedManager] connectToDefaultSmartHelmet:^(NSError *error) {
+        if(error){
+            //Alert user with error description
+        }
+    }];
 }
 - (void)stop{
-    [self.melodySmart disconnect];
+//    [self.melodySmart disconnect];
+    [[SmartBLEManager sharedManager] disconnectSmartHelmet:^(NSError *error) {
+        if(error){
+            //Alert user with error description
+        }
+    }];
 }
 - (void)clearObjects {
     NSMutableArray *indexPaths = [NSMutableArray array];
@@ -464,7 +476,12 @@ NSTimer *rssiTimer;
     switch (btn.tag) {
         case 301://Cycling
         {
-            cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0x0A 0xEC 0x0101040404 0x01%@",[self getcurrentHexTimestamp]];
+//            cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0x0A 0xEC 0x0101040404 0x01%@",[self getcurrentHexTimestamp]];
+            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_CYCLING_MODE completion:^(NSError *error) {
+                if(error){
+                    
+                }
+            }];
             break;
         }
         case 302://Motosport

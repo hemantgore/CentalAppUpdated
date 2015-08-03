@@ -6,10 +6,22 @@
 //
 
 #import <Foundation/Foundation.h>
-
+typedef enum {
+    CMD_SET_CYCLING_MODE,
+    CMD_SET_MOTOSPORT_MODE,
+    CMD_SET_WINTERSPORT_MODE,
+    CMD_SET_LONGBOARDING_MODE,
+    CMD_SET_DEBUG_MODE,
+    CMD_SET_STUNT_MODE,
+    CMD_SET_RACE_MODE,
+    CMD_SET_COMMUTE_MODE
+    
+}CMD_TYPE;
 @interface SmartBLEManager : NSObject
 
 + (id)sharedManager;
-- (void)scanSmartHelmet:(void(^)(NSError *error)) scanBlock;
+- (void)scanSmartHelmet:(void(^)(NSError *error))scanBlock;
 - (void)connectToDefaultSmartHelmet:(void(^)(NSError *error))connectBlock;
+- (void)disconnectSmartHelmet:(void(^)(NSError *error))disconnectBlock;
+- (void) sendCommandToHelmet:(CMD_TYPE)cmd completion:(void(^) (NSError *error))cmdCompletion;
 @end
