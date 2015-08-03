@@ -521,10 +521,7 @@ NSTimer *rssiTimer;
 
 -(void)sendDataToMelody{
     
-    
-//    self.commandTextField.text = cmd;
     if (self.sendDataIndex >= self.dataToSend.length) {
-        
         // No data left.  Do nothing
         return;
     }

@@ -6,3 +6,7 @@
 SmartCentral.xcodeproj/project.xcworkspace/xcuserdata/Apple.xcuserdatad/UserInterfaceState.xcuserstate
 
 *.xcuserstate
+
+*.xcscheme
+
+SmartCentral.xcodeproj/xcuserdata/hemant.d.gore.xcuserdatad/xcschemes/xcschememanagement.plist

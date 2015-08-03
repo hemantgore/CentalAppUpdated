@@ -21,6 +21,7 @@
 		2C2B227F1B39EB6E006CEE7F /* BLE.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C2B227E1B39EB6E006CEE7F /* BLE.m */; };
 		2CC5EA0A1B54515900F490ED /* libMelodySmart in Resources */ = {isa = PBXBuildFile; fileRef = 2CC5EA091B54515900F490ED /* libMelodySmart */; };
 		2CC5EA0C1B54520100F490ED /* libMelodySmart.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CC5EA0B1B54520100F490ED /* libMelodySmart.a */; };
+		B1D4BB731B6F8A7D00278AE3 /* SmartBLEManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B1D4BB721B6F8A7D00278AE3 /* SmartBLEManager.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,6 +57,8 @@
 		2C2B227E1B39EB6E006CEE7F /* BLE.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BLE.m; sourceTree = "<group>"; };
 		2CC5EA091B54515900F490ED /* libMelodySmart */ = {isa = PBXFileReference; lastKnownFileType = folder; path = libMelodySmart; sourceTree = "<group>"; };
 		2CC5EA0B1B54520100F490ED /* libMelodySmart.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libMelodySmart.a; path = SmartCentral/libMelodySmart/libMelodySmart.a; sourceTree = "<group>"; };
+		B1D4BB711B6F8A7D00278AE3 /* SmartBLEManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SmartBLEManager.h; sourceTree = "<group>"; };
+		B1D4BB721B6F8A7D00278AE3 /* SmartBLEManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SmartBLEManager.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -114,6 +117,8 @@
 				2C2B225A1B39E97C006CEE7F /* Images.xcassets */,
 				2C2B225C1B39E97C006CEE7F /* LaunchScreen.xib */,
 				2C2B224D1B39E97C006CEE7F /* Supporting Files */,
+				B1D4BB711B6F8A7D00278AE3 /* SmartBLEManager.h */,
+				B1D4BB721B6F8A7D00278AE3 /* SmartBLEManager.m */,
 			);
 			path = SmartCentral;
 			sourceTree = "<group>";
@@ -266,6 +271,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B1D4BB731B6F8A7D00278AE3 /* SmartBLEManager.m in Sources */,
 				2C2B22561B39E97C006CEE7F /* ViewController.m in Sources */,
 				2C2B22531B39E97C006CEE7F /* AppDelegate.m in Sources */,
 				2C2B22501B39E97C006CEE7F /* main.m in Sources */,
