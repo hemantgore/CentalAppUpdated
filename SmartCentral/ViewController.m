@@ -37,9 +37,9 @@
 //    bleShield.delegate = self;
     
     //Melody Manager
-//    melodyManager = [MelodyManager new];
-//    [melodyManager setForService:nil andDataCharacterisitc:nil andPioReportCharacteristic:nil andPioSettingCharacteristic:nil];
-//    melodyManager.delegate = self;
+    melodyManager = [MelodyManager new];
+    [melodyManager setForService:nil andDataCharacterisitc:nil andPioReportCharacteristic:nil andPioSettingCharacteristic:nil];
+    melodyManager.delegate = self;
     
     
 }
@@ -51,15 +51,15 @@
 //    [melodyManager stopScanning];
 }
 - (void)scan {
-//    [self clearObjects];
-//    [melodyManager scanForMelody];
-//    [self performSelector:@selector(stop) withObject:nil afterDelay:3.0];
-//    [NSTimer scheduledTimerWithTimeInterval:(float)3.2 target:self selector:@selector(connectionTimer:) userInfo:nil repeats:NO];
-    [[SmartBLEManager sharedManager] connectToDefaultSmartHelmet:^(NSError *error) {
-        if(error){
-            //Alert user with error description
-        }
-    }];
+    [self clearObjects];
+    [melodyManager scanForMelody];
+    [self performSelector:@selector(stop) withObject:nil afterDelay:3.0];
+    [NSTimer scheduledTimerWithTimeInterval:(float)3.2 target:self selector:@selector(connectionTimer:) userInfo:nil repeats:NO];
+//    [[SmartBLEManager sharedManager] connectToDefaultSmartHelmet:^(NSError *error) {
+//        if(error){
+//            //Alert user with error description
+//        }
+//    }];
 }
 - (void)stop{
 //    [self.melodySmart disconnect];
@@ -341,7 +341,7 @@ NSTimer *rssiTimer;
 //}
 - (IBAction)setLED:(UISwitch*)sender{
     
-    uint8_t send[] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+    uint32_t send[] = {0x00001,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x0000000001};
     /*
      4.3.1 System Message Format
      MSGID|MSGTYP|NODEID|VCSID|CMDTYP||CMD||CMDPKT|PRI|TIMSTMP
@@ -486,51 +486,123 @@ NSTimer *rssiTimer;
         }
         case 302://Motosport
         {
-            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0x0A 0xEC 0x0102040404 0x01%@",[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0x0A 0xEC 0x0102040404 0x01 %@",[self getcurrentHexTimestamp]];
             break;
         }
         case 303://Wintersport
         {
-            cmdData = [NSString stringWithFormat:@"0x0003 0xB0 0xFD 0xC3 0x0A 0xEC 0x0103040404 0x01%@",[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0003 0xB0 0xFD 0xC3 0x0A 0xEC 0x0103040404 0x01 %@",[self getcurrentHexTimestamp]];
             break;
         }
         case 304://Longboarding
         {
-            cmdData = [NSString stringWithFormat:@"0x0004 0xB0 0xFD 0xC3 0x0A 0xEC 0x0104040404 0x01%@",[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0004 0xB0 0xFD 0xC3 0x0A 0xEC 0x0104040404 0x01 %@",[self getcurrentHexTimestamp]];
             break;
         }
         case 305://Debug
         {
-            cmdData = [NSString stringWithFormat:@"0x0005 0xB0 0xFD 0xC3 0x0A 0xEC 0x0105040404 0x01%@",[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0005 0xB0 0xFD 0xC3 0x0A 0xEC 0x0105040404 0x01 %@",[self getcurrentHexTimestamp]];
             break;
         }
         case 401://Stunt
         {
-            cmdData = [NSString stringWithFormat:@"0x0006 0xB0 0xFD 0xC3 0x0A 0xEB 0x0101040404 0x01%@",[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0006 0xB0 0xFD 0xC3 0x0A 0xEB 0x0101040404 0x01 %@",[self getcurrentHexTimestamp]];
             break;
         }
         case 402://Race
         {
-            cmdData = [NSString stringWithFormat:@"0x0007 0xB0 0xFD 0xC3 0x0A 0xEB 0x0102040404 0x01%@",[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0007 0xB0 0xFD 0xC3 0x0A 0xEB 0x0102040404 0x01 %@",[self getcurrentHexTimestamp]];
             break;
         }
         case 403://Commute
         {
-            cmdData = [NSString stringWithFormat:@"0x0008 0xB0 0xFD 0xC3 0x0A 0xEB 0x0103040404 0x01%@",[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0008 0xB0 0xFD 0xC3 0x0A 0xEB 0x0103040404 0x01 %@",[self getcurrentHexTimestamp]];
             break;
         }
         default:
             break;
     }
+    NSData *data = [self dataFromHexString:cmdData];
+    
     cmdData = [cmdData stringByReplacingOccurrencesOfString:@" " withString:@""];
-    cmdData = [NSString stringWithFormat:@"SEND %@",cmdData];
+    cmdData = [NSString stringWithFormat:@"SEND "];
+
     self.dataToSend = [cmdData dataUsingEncoding:NSUTF8StringEncoding];
+    NSMutableData *cmdDataTmp =(NSMutableData*)self.dataToSend;
+    [cmdDataTmp appendData:data];
+    self.dataToSend = cmdDataTmp;
+    
     self.commandTextField.text = cmdData;
     self.sendDataIndex = 0;
     [self.commandTextField resignFirstResponder];
     [self sendDataToMelody];
 }
+/* Converts a hex string to bytes.
+ Precondition:
+ . The hex string can be separated by space or not.
+ . the string length without space or 0x, must be even. 2 symbols for one byte/char
+ . sample input: 23 3A F1 OR 233AF1, 0x23 0X231f 2B
+ */
 
+- (NSData *) dataFromHexString:(NSString*)hexString
+{
+    NSString * cleanString = [self cleanNonHexCharsFromHexString:hexString];
+    if (cleanString == nil) {
+        return nil;
+    }
+    
+    NSMutableData *result = [[NSMutableData alloc] init];
+    
+    int i = 0;
+    for (i = 0; i+2 <= cleanString.length; i+=2) {
+        NSRange range = NSMakeRange(i, 2);
+        NSString* hexStr = [cleanString substringWithRange:range];
+        NSScanner* scanner = [NSScanner scannerWithString:hexStr];
+        unsigned int intValue;
+        [scanner scanHexInt:&intValue];
+        unsigned char uc = (unsigned char) intValue;
+        [result appendBytes:&uc length:1];
+    }
+    NSData * data = [NSData dataWithData:result];
+    return data;
+}
+
+/* Clean a hex string by removing spaces and 0x chars.
+ . The hex string can be separated by space or not.
+ . sample input: 23 3A F1; 233AF1; 0x23 0x3A 0xf1
+ */
+
+- (NSString *) cleanNonHexCharsFromHexString:(NSString *)input
+{
+    if (input == nil) {
+        return nil;
+    }
+    
+    NSString * output = [input stringByReplacingOccurrencesOfString:@"0x" withString:@""
+                                                            options:NSCaseInsensitiveSearch range:NSMakeRange(0, input.length)];
+    NSString * hexChars = @"0123456789abcdefABCDEF";
+    NSCharacterSet *hexc = [NSCharacterSet characterSetWithCharactersInString:hexChars];
+    NSCharacterSet *invalidHexc = [hexc invertedSet];
+    NSString * allHex = [[output componentsSeparatedByCharactersInSet:invalidHexc] componentsJoinedByString:@""];
+    return allHex;
+}
+//- (NSData *)dataFromHexString:(NSString*)string {
+//    const char *chars = [string UTF8String];
+//    NSInteger i = 0, len = string.length;
+//    
+//    NSMutableData *data = [NSMutableData dataWithCapacity:len / 2];
+//    char byteChars[3] = {'\0','\0','\0'};
+//    unsigned long wholeByte;
+//    
+//    while (i < len) {
+//        byteChars[0] = chars[i++];
+//        byteChars[1] = chars[i++];
+//        wholeByte = strtoul(byteChars, NULL, 16);
+//        [data appendBytes:&wholeByte length:1];
+//    }
+//    
+//    return data;
+//}
 - (IBAction)clearDebugArea:(id)sender {
     str = nil;
     self.degubInfoTextView.text =@"";
