@@ -20,6 +20,8 @@ typedef enum {
 @interface SmartBLEManager : NSObject
 
 + (id)sharedManager;
+- (BOOL)isConnected;
+- (NSString*)name;
 - (void)scanSmartHelmet:(void(^)(NSError *error))scanBlock;
 - (void)connectToDefaultSmartHelmet:(void(^)(NSError *error))connectBlock;
 - (void)disconnectSmartHelmet:(void(^)(NSError *error))disconnectBlock;

@@ -37,9 +37,9 @@
 //    bleShield.delegate = self;
     
     //Melody Manager
-    melodyManager = [MelodyManager new];
-    [melodyManager setForService:nil andDataCharacterisitc:nil andPioReportCharacteristic:nil andPioSettingCharacteristic:nil];
-    melodyManager.delegate = self;
+//    melodyManager = [MelodyManager new];
+//    [melodyManager setForService:nil andDataCharacterisitc:nil andPioReportCharacteristic:nil andPioSettingCharacteristic:nil];
+//    melodyManager.delegate = self;
     
     
 }
@@ -51,21 +51,48 @@
 //    [melodyManager stopScanning];
 }
 - (void)scan {
-    [self clearObjects];
-    [melodyManager scanForMelody];
-    [self performSelector:@selector(stop) withObject:nil afterDelay:3.0];
-    [NSTimer scheduledTimerWithTimeInterval:(float)3.2 target:self selector:@selector(connectionTimer:) userInfo:nil repeats:NO];
-//    [[SmartBLEManager sharedManager] connectToDefaultSmartHelmet:^(NSError *error) {
-//        if(error){
-//            //Alert user with error description
-//        }
-//    }];
+    //    [self clearObjects];
+    //    [melodyManager scanForMelody];
+    //    [self performSelector:@selector(stop) withObject:nil afterDelay:3.0];
+    //    [NSTimer scheduledTimerWithTimeInterval:(float)3.2 target:self selector:@selector(connectionTimer:) userInfo:nil repeats:NO];
+    [[SmartBLEManager sharedManager] scanSmartHelmet:^(NSError *error) {
+        if(error){
+            
+        }else{
+            [[SmartBLEManager sharedManager] connectToDefaultSmartHelmet:^(NSError *error) {
+                if(error){
+                    //Alert user with error description
+                    NSLog(@"error connectToDefaultSmartHelmet::%@",error);
+                }else{
+                    NSLog(@"connectToDefaultSmartHelmet");
+                    [self.scanBtn setTitle:@"Disconnect" forState:UIControlStateNormal];
+                    if (str == nil) {
+                        str = [NSMutableString stringWithFormat:@"Connected to %@\n",[[SmartBLEManager sharedManager] name]];
+                    } else {
+                        [str appendFormat:@"Connected to %@\n",[[SmartBLEManager sharedManager] name]];
+                    }
+                    self.degubInfoTextView.text =str;
+                }
+            }];
+            
+        }
+    }];
 }
 - (void)stop{
 //    [self.melodySmart disconnect];
     [[SmartBLEManager sharedManager] disconnectSmartHelmet:^(NSError *error) {
         if(error){
             //Alert user with error description
+            NSLog(@"error disconnectSmartHelmet::%@",error);
+        }else{
+            NSLog(@"disconnectSmartHelmet");
+            [self.scanBtn setTitle:@"Connect" forState:UIControlStateNormal];
+            if (str == nil) {
+                str = [NSMutableString stringWithFormat:@"Disconnected \n"];
+            } else {
+                [str appendFormat:@"Disconnected\n"];
+            }
+            self.degubInfoTextView.text =str;
         }
     }];
 }
@@ -157,7 +184,8 @@
 -(BOOL)textFieldShouldReturn:(UITextField *)textField {
 //    [_melodySmart sendRemoteCommand:self.commandTextField.text];
     
-    self.dataToSend = [textField.text dataUsingEncoding:NSUTF8StringEncoding];
+//    self.dataToSend = [textField.text dataUsingEncoding:NSUTF8StringEncoding];
+    self.dataToSend = [self dataFromHexString:textField.text];
 //    self.commandTextField.text = cmdData;
     self.sendDataIndex = 0;
     [self.commandTextField resignFirstResponder];
@@ -197,11 +225,16 @@
 }
 - (IBAction)ScanForBLE:(id)sender
 {
-    if(self.melodySmart.isConnected){
+    if([[SmartBLEManager sharedManager] isConnected]){
         [self stop];
     }else{
         [self scan];
     }
+//    if(self.melodySmart.isConnected){
+//        [self stop];
+//    }else{
+//        [self scan];
+//    }
 //    if (bleShield.activePeripheral)
 //        if(bleShield.activePeripheral.state == CBPeripheralStateConnected)
 //        {
@@ -476,12 +509,14 @@ NSTimer *rssiTimer;
     switch (btn.tag) {
         case 301://Cycling
         {
-            cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0x0A 0xEC 0x0101040404 0x01 %@",[self getcurrentHexTimestamp]];
-//            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_CYCLING_MODE completion:^(NSError *error) {
-//                if(error){
-//                    
-//                }
-//            }];
+//            cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0x0A 0xEC 0x0101040404 0x01 %@",[self getcurrentHexTimestamp]];
+            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_CYCLING_MODE completion:^(NSError *error) {
+                if(error){
+                    NSLog(@"CMD_SET_CYCLING_MODE Fail");
+                }else{
+                    NSLog(@"CMD_SET_CYCLING_MODE");
+                }
+            }];
             break;
         }
         case 302://Motosport
@@ -530,12 +565,12 @@ NSTimer *rssiTimer;
 //    self.dataToSend = [cmdData dataUsingEncoding:NSUTF8StringEncoding];
 //    NSMutableData *cmdDataTmp =(NSMutableData*)self.dataToSend;
 //    [cmdDataTmp appendData:data];
-    self.dataToSend = [self dataFromHexString:cmdData];
+//    self.dataToSend = [self dataFromHexString:cmdData];
     
     self.commandTextField.text = cmdData;
     self.sendDataIndex = 0;
     [self.commandTextField resignFirstResponder];
-    [self sendDataToMelody];
+//    [self sendDataToMelody];
 }
 /* Converts a hex string to bytes.
  Precondition:
