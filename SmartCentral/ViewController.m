@@ -476,12 +476,12 @@ NSTimer *rssiTimer;
     switch (btn.tag) {
         case 301://Cycling
         {
-//            cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0x0A 0xEC 0x0101040404 0x01%@",[self getcurrentHexTimestamp]];
-            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_CYCLING_MODE completion:^(NSError *error) {
-                if(error){
-                    
-                }
-            }];
+            cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0x0A 0xEC 0x0101040404 0x01 %@",[self getcurrentHexTimestamp]];
+//            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_CYCLING_MODE completion:^(NSError *error) {
+//                if(error){
+//                    
+//                }
+//            }];
             break;
         }
         case 302://Motosport
@@ -522,15 +522,15 @@ NSTimer *rssiTimer;
         default:
             break;
     }
-    NSData *data = [self dataFromHexString:cmdData];
+//    NSData *data = [self dataFromHexString:cmdData];
     
     cmdData = [cmdData stringByReplacingOccurrencesOfString:@" " withString:@""];
-    cmdData = [NSString stringWithFormat:@"SEND "];
+//    cmdData = [NSString stringWithFormat:@"SEND "];
 
-    self.dataToSend = [cmdData dataUsingEncoding:NSUTF8StringEncoding];
-    NSMutableData *cmdDataTmp =(NSMutableData*)self.dataToSend;
-    [cmdDataTmp appendData:data];
-    self.dataToSend = cmdDataTmp;
+//    self.dataToSend = [cmdData dataUsingEncoding:NSUTF8StringEncoding];
+//    NSMutableData *cmdDataTmp =(NSMutableData*)self.dataToSend;
+//    [cmdDataTmp appendData:data];
+    self.dataToSend = [self dataFromHexString:cmdData];
     
     self.commandTextField.text = cmdData;
     self.sendDataIndex = 0;
@@ -639,9 +639,9 @@ NSTimer *rssiTimer;
     NSString *stringFromData = [[NSString alloc] initWithData:chunk encoding:NSUTF8StringEncoding];
     NSLog(@"Sent: %@", stringFromData);
     if (str == nil) {
-        str = [NSMutableString stringWithFormat:@"%@\n", stringFromData];
+        str = [NSMutableString stringWithFormat:@"%@\n", self.commandTextField.text];
     } else {
-        [str appendFormat:@"%@\n", stringFromData];
+        [str appendFormat:@"%@\n", self.commandTextField.text];
     }
     self.degubInfoTextView.text =str;
     // It did send, so update our index
