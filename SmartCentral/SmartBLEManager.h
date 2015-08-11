@@ -14,7 +14,9 @@ typedef enum {
     CMD_SET_DEBUG_MODE,
     CMD_SET_STUNT_MODE,
     CMD_SET_RACE_MODE,
-    CMD_SET_COMMUTE_MODE
+    CMD_SET_COMMUTE_MODE,
+    CMD_SET_LED_BRIGHTNESS
+    
     
 }CMD_TYPE;
 @interface SmartBLEManager : NSObject
@@ -25,5 +27,5 @@ typedef enum {
 - (void)scanSmartHelmet:(void(^)(NSError *error))scanBlock;
 - (void)connectToDefaultSmartHelmet:(void(^)(NSError *error))connectBlock;
 - (void)disconnectSmartHelmet:(void(^)(NSError *error))disconnectBlock;
-- (void) sendCommandToHelmet:(CMD_TYPE)cmd completion:(void(^) (NSError *error))cmdCompletion;
+- (void)sendCommandToHelmet:(CMD_TYPE)cmd value:(NSString*)value completion:(void(^) (NSError *error))cmdCompletion;
 @end

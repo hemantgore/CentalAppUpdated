@@ -17,6 +17,7 @@
     NSMutableArray *_objects;
     SmartBLEManager *smartManager;
 }
+@property (weak, nonatomic) IBOutlet UIView *ledBrightnessView;
 @property (weak, nonatomic) IBOutlet UIButton *scanBtn;
 @property (strong, nonatomic) IBOutlet UIView *cyclingModeBtn;
 @property (weak, nonatomic) IBOutlet UITextView *degubInfoTextView;
@@ -24,6 +25,7 @@
 @property (strong, nonatomic) MelodySmart *melodySmart;
 @property (strong, nonatomic) NSData                    *dataToSend;
 @property (nonatomic, readwrite) NSInteger              sendDataIndex;
+@property (weak, nonatomic) IBOutlet UILabel *ledBrightnessValue;
 @end
 
 @implementation ViewController
@@ -510,7 +512,7 @@ NSTimer *rssiTimer;
         case 301://Cycling
         {
 //            cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0x0A 0xEC 0x0101040404 0x01 %@",[self getcurrentHexTimestamp]];
-            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_CYCLING_MODE completion:^(NSError *error) {
+            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_CYCLING_MODE value:@"" completion:^(NSError *error) {
                 if(error){
                     NSLog(@"CMD_SET_CYCLING_MODE Fail");
                 }else{
@@ -521,37 +523,86 @@ NSTimer *rssiTimer;
         }
         case 302://Motosport
         {
-            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0x0A 0xEC 0x0102040404 0x01 %@",[self getcurrentHexTimestamp]];
+//            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0x0A 0xEC 0x0102040404 0x01 %@",[self getcurrentHexTimestamp]];
+            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_MOTOSPORT_MODE value:@"" completion:^(NSError *error) {
+                if(error){
+                    NSLog(@"CMD_SET_MOTOSPORT_MODE Fail");
+                }else{
+                    NSLog(@"CMD_SET_MOTOSPORT_MODE");
+                }
+            }];
             break;
         }
         case 303://Wintersport
         {
-            cmdData = [NSString stringWithFormat:@"0x0003 0xB0 0xFD 0xC3 0x0A 0xEC 0x0103040404 0x01 %@",[self getcurrentHexTimestamp]];
+//            cmdData = [NSString stringWithFormat:@"0x0003 0xB0 0xFD 0xC3 0x0A 0xEC 0x0103040404 0x01 %@",[self getcurrentHexTimestamp]];
+            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_WINTERSPORT_MODE value:@"" completion:^(NSError *error) {
+                if(error){
+                    NSLog(@"CMD_SET_WINTERSPORT_MODE Fail");
+                }else{
+                    NSLog(@"CMD_SET_WINTERSPORT_MODE");
+                }
+            }];
             break;
         }
         case 304://Longboarding
         {
-            cmdData = [NSString stringWithFormat:@"0x0004 0xB0 0xFD 0xC3 0x0A 0xEC 0x0104040404 0x01 %@",[self getcurrentHexTimestamp]];
+//            cmdData = [NSString stringWithFormat:@"0x0004 0xB0 0xFD 0xC3 0x0A 0xEC 0x0104040404 0x01 %@",[self getcurrentHexTimestamp]];
+            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_LONGBOARDING_MODE value:@"" completion:^(NSError *error) {
+                if(error){
+                    NSLog(@"CMD_SET_LONGBOARDING_MODE Fail");
+                }else{
+                    NSLog(@"CMD_SET_LONGBOARDING_MODE");
+                }
+            }];
             break;
         }
         case 305://Debug
         {
-            cmdData = [NSString stringWithFormat:@"0x0005 0xB0 0xFD 0xC3 0x0A 0xEC 0x0105040404 0x01 %@",[self getcurrentHexTimestamp]];
+//            cmdData = [NSString stringWithFormat:@"0x0005 0xB0 0xFD 0xC3 0x0A 0xEC 0x0105040404 0x01 %@",[self getcurrentHexTimestamp]];
+            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_DEBUG_MODE value:@"" completion:^(NSError *error) {
+                if(error){
+                    NSLog(@"CMD_SET_DEBUG_MODE Fail");
+                }else{
+                    NSLog(@"CMD_SET_DEBUG_MODE");
+                }
+            }];
             break;
         }
         case 401://Stunt
         {
-            cmdData = [NSString stringWithFormat:@"0x0006 0xB0 0xFD 0xC3 0x0A 0xEB 0x0101040404 0x01 %@",[self getcurrentHexTimestamp]];
+//            cmdData = [NSString stringWithFormat:@"0x0006 0xB0 0xFD 0xC3 0x0A 0xEB 0x0101040404 0x01 %@",[self getcurrentHexTimestamp]];
+            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_STUNT_MODE value:@"" completion:^(NSError *error) {
+                if(error){
+                    NSLog(@"CMD_SET_STUNT_MODE Fail");
+                }else{
+                    NSLog(@"CMD_SET_STUNT_MODE");
+                }
+            }];
             break;
         }
         case 402://Race
         {
-            cmdData = [NSString stringWithFormat:@"0x0007 0xB0 0xFD 0xC3 0x0A 0xEB 0x0102040404 0x01 %@",[self getcurrentHexTimestamp]];
+//            cmdData = [NSString stringWithFormat:@"0x0007 0xB0 0xFD 0xC3 0x0A 0xEB 0x0102040404 0x01 %@",[self getcurrentHexTimestamp]];
+            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_RACE_MODE value:@"" completion:^(NSError *error) {
+                if(error){
+                    NSLog(@"CMD_SET_RACE_MODE Fail");
+                }else{
+                    NSLog(@"CMD_SET_RACE_MODE");
+                }
+            }];
             break;
         }
         case 403://Commute
         {
-            cmdData = [NSString stringWithFormat:@"0x0008 0xB0 0xFD 0xC3 0x0A 0xEB 0x0103040404 0x01 %@",[self getcurrentHexTimestamp]];
+//            cmdData = [NSString stringWithFormat:@"0x0008 0xB0 0xFD 0xC3 0x0A 0xEB 0x0103040404 0x01 %@",[self getcurrentHexTimestamp]];
+            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_COMMUTE_MODE value:@"" completion:^(NSError *error) {
+                if(error){
+                    NSLog(@"CMD_SET_COMMUTE_MODE Fail");
+                }else{
+                    NSLog(@"CMD_SET_COMMUTE_MODE");
+                }
+            }];
             break;
         }
         default:
@@ -690,4 +741,17 @@ NSTimer *rssiTimer;
     NSLog(@"%@", hexTimeStamp);
     return hexTimeStamp;
 }
+
+- (IBAction)ledBrightnessChanged:(id)sender {
+    UISlider *slider = (UISlider*)sender;
+    self.ledBrightnessValue.text =[NSString stringWithFormat:@"%d",(NSInteger)slider.value];
+    [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_LED_BRIGHTNESS value:self.ledBrightnessValue.text completion:^(NSError *error) {
+        if(error){
+            NSLog(@"CMD_SET_LED_BRIGHTNESS Fail");
+        }else{
+            NSLog(@"CMD_SET_LED_BRIGHTNESS");
+        }
+    }];
+}
+
 @end

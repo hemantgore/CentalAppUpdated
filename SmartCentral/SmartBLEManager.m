@@ -160,7 +160,7 @@ static void (^__commandCompletionBlock)(NSError *error);
     
 }
 #pragma mark - Send data to BLE -
-- (void) sendCommandToHelmet:(CMD_TYPE)cmd completion:(void(^) (NSError *error))cmdCompletion
+- (void) sendCommandToHelmet:(CMD_TYPE)cmd value:(NSString*)value  completion:(void(^) (NSError *error))cmdCompletion
 {
     __commandCompletionBlock = cmdCompletion;
     if(!_isPowerOn){
@@ -208,6 +208,12 @@ static void (^__commandCompletionBlock)(NSError *error);
         case CMD_SET_COMMUTE_MODE://Commute
         {
             cmdData = [NSString stringWithFormat:@"0x0008 0xB0 0xFD 0xC3 0x0A 0xEB 0x0103040404 0x01 %@",[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_LED_BRIGHTNESS:{
+        /*SetLedBriht 0x02 The command sets the Smart Helmet’s LED brightness level.
+        Values: 0x00 – 0xFF         */
+            cmdData = [NSString stringWithFormat:@"0x0009 0xB0 0xFD 0xC1 0x0A 0x02 0x01%lX040404 0x01 %@",(long)value,[self getcurrentHexTimestamp]];
             break;
         }
         default:
@@ -327,5 +333,23 @@ static void (^__commandCompletionBlock)(NSError *error);
     NSCharacterSet *invalidHexc = [hexc invertedSet];
     NSString * allHex = [[output componentsSeparatedByCharactersInSet:invalidHexc] componentsJoinedByString:@""];
     return allHex;
+}
+- (NSString *)stringToHex:(NSString *)stringInput
+{
+//    NSUInteger len = [stringInput length];
+//    unichar *chars = malloc(len * sizeof(unichar));
+//    [stringInput getCharacters:chars];
+//    
+//    NSMutableString *hexString = [[NSMutableString alloc] init];
+//    
+//    for(NSUInteger i = 0; i < len; i++ )
+//    {
+//        // [hexString [NSString stringWithFormat:@"%02x", chars[i]]]; /*previous input*/
+//        [hexString appendFormat:@"%02x", chars[i]]; /*EDITED PER COMMENT BELOW*/
+//    }
+//    free(chars);
+    NSString *hexString = [NSString stringWithFormat:@"%X",
+                              [stringInput integerValue]];
+    return hexString;
 }
 @end
