@@ -216,6 +216,18 @@ static void (^__commandCompletionBlock)(NSError *error);
             cmdData = [NSString stringWithFormat:@"0x0009 0xB0 0xFD 0xC1 0x0A 0x02 0x01%lX040404 0x01 %@",(long)value,[self getcurrentHexTimestamp]];
             break;
         }
+        case CMD_SET_LED_AUTO_ON_OFF:{
+            /*ActAutoLits 0x09 The command switches the Autonomous lighting system on or off.
+             Values: On/Off i.e 0x01 or 0x00         */
+            cmdData = [NSString stringWithFormat:@"0x000A 0xB0 0xFD 0xC1 0x0A 0x09 0x01%lX040404 0x01 %@",(long)value,[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_LED_BLINK_RATE:{
+            /*SetBlnkRat 0x03 his command sets the LED blink rate for turn signals, emergency braking and hazard lights.
+             Values: 0x01 - Slow 0x02 - Medium 0x03 - Fast 0x04 - Fastest       */
+            cmdData = [NSString stringWithFormat:@"0x000B 0xB0 0xFD 0xC1 0x0A 0x03 0x01%lX040404 0x01 %@",(long)value,[self getcurrentHexTimestamp]];
+            break;
+        }
         default:
             break;
     }
