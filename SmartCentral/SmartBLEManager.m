@@ -160,7 +160,7 @@ static void (^__commandCompletionBlock)(NSError *error);
     
 }
 #pragma mark - Send data to BLE -
-- (void) sendCommandToHelmet:(CMD_TYPE)cmd value:(NSString*)value  completion:(void(^) (NSError *error))cmdCompletion
+- (void) sendCommandToHelmet:(CMD_TYPE)cmd params:(NSDictionary*)params  completion:(void(^) (NSError *error))cmdCompletion
 {
     __commandCompletionBlock = cmdCompletion;
     if(!_isPowerOn){
@@ -172,60 +172,208 @@ static void (^__commandCompletionBlock)(NSError *error);
     switch (cmd) {
         case CMD_SET_CYCLING_MODE://Cycling
         {
-            cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0x0A 0xEC 0x0101040404 0x01 %@",[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0xA0 0xEC 0x0101040404 0x01 %@",[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_MOTOSPORT_MODE://Motosport
         {
-            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0x0A 0xEC 0x0102040404 0x01 %@",[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0xA0 0xEC 0x0102040404 0x01 %@",[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_WINTERSPORT_MODE://Wintersport
         {
-            cmdData = [NSString stringWithFormat:@"0x0003 0xB0 0xFD 0xC3 0x0A 0xEC 0x0103040404 0x01 %@",[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0003 0xB0 0xFD 0xC3 0xA0 0xEC 0x0103040404 0x01 %@",[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_LONGBOARDING_MODE://Longboarding
         {
-            cmdData = [NSString stringWithFormat:@"0x0004 0xB0 0xFD 0xC3 0x0A 0xEC 0x0104040404 0x01 %@",[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0004 0xB0 0xFD 0xC3 0xA0 0xEC 0x0104040404 0x01 %@",[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_DEBUG_MODE://Debug
         {
-            cmdData = [NSString stringWithFormat:@"0x0005 0xB0 0xFD 0xC3 0x0A 0xEC 0x0105040404 0x01 %@",[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0005 0xB0 0xFD 0xC3 0xA0 0xEC 0x0105040404 0x01 %@",[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_STUNT_MODE://Stunt
         {
-            cmdData = [NSString stringWithFormat:@"0x0006 0xB0 0xFD 0xC3 0x0A 0xEB 0x0101040404 0x01 %@",[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0006 0xB0 0xFD 0xC3 0xA0 0xEB 0x0101040404 0x01 %@",[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_RACE_MODE://Race
         {
-            cmdData = [NSString stringWithFormat:@"0x0007 0xB0 0xFD 0xC3 0x0A 0xEB 0x0102040404 0x01 %@",[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0007 0xB0 0xFD 0xC3 0xA0 0xEB 0x0102040404 0x01 %@",[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_COMMUTE_MODE://Commute
         {
-            cmdData = [NSString stringWithFormat:@"0x0008 0xB0 0xFD 0xC3 0x0A 0xEB 0x0103040404 0x01 %@",[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0008 0xB0 0xFD 0xC3 0xA0 0xEB 0x0103040404 0x01 %@",[self getcurrentHexTimestamp]];
             break;
         }
-        case CMD_SET_LED_BRIGHTNESS:{
+        case CMD_SET_LED_BRIGHTNESS:
+        {
         /*SetLedBriht 0x02 The command sets the Smart Helmet’s LED brightness level.
         Values: 0x00 – 0xFF         */
-            cmdData = [NSString stringWithFormat:@"0x0009 0xB0 0xFD 0xC1 0x0A 0x02 0x01%lX040404 0x01 %@",(long)value,[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0009 0xB0 0xFD 0xC1 0xA0 0x02 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
             break;
         }
-        case CMD_SET_LED_AUTO_ON_OFF:{
+        case CMD_SET_LED_AUTO_ON_OFF:
+        {
             /*ActAutoLits 0x09 The command switches the Autonomous lighting system on or off.
              Values: On/Off i.e 0x01 or 0x00         */
-            cmdData = [NSString stringWithFormat:@"0x000A 0xB0 0xFD 0xC1 0x0A 0x09 0x01%lX040404 0x01 %@",(long)value,[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x000A 0xB0 0xFD 0xC1 0xA0 0x09 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
             break;
         }
-        case CMD_SET_LED_BLINK_RATE:{
+        case CMD_SET_LED_BLINK_RATE:
+        {
             /*SetBlnkRat 0x03 his command sets the LED blink rate for turn signals, emergency braking and hazard lights.
              Values: 0x01 - Slow 0x02 - Medium 0x03 - Fast 0x04 - Fastest       */
-            cmdData = [NSString stringWithFormat:@"0x000B 0xB0 0xFD 0xC1 0x0A 0x03 0x01%lX040404 0x01 %@",(long)value,[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x000B 0xB0 0xFD 0xC1 0xA0 0x03 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_FRONT_CAM_ON_OFF:
+        {
+            /*Set_ftcam_act: 0x0C
+             VAlues: on/off */
+            cmdData = [NSString stringWithFormat:@"0x000C 0xB0 0xFD 0xC2 0xA0 0x0C 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_REAR_CAM_ON_OFF:
+        {
+            /*Set_rrcam_act:0x0D*/
+            cmdData = [NSString stringWithFormat:@"0x000D 0xB0 0xFD 0xC2 0xA0 0x0D 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_FRONT_CAM_MODE:
+        {
+            /*Set_ftcam_mod::  0x03
+             values: 0x01 Stills 0x02 Video*/
+            cmdData = [NSString stringWithFormat:@"0x000E 0xB0 0xFD 0xC2 0xA0 0x03 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_FRONT_CAM_RESOLUTION:
+        {
+            /*Set_rrcam_res: 0x01
+             Values: 0x01 VGA 0x02 SVGA 0x03 XGA 0x04 SXGA 0x05 QVGA 0x06 720P 0x07 1080P 0x08 NTSC 0x09 PAL 0x0A User Defined
+             P2. P3
+             Note: The option for “User Defined” resolution can only be chosen in debug mode and if “User Defined” is the chosen, the command must be accompanied by two additional parameters. P2. Res.Horz P3. Res.Vertical
+             */
+            if([[params valueForKey:@"1"] integerValue]==10){
+                cmdData = [NSString stringWithFormat:@"0x000F 0xB0 0xFD 0xC1 0xA0 0x01 0x02%lX%lX%lX040404 0x01 %@",(long)[params valueForKey:@"1"],(long)[params valueForKey:@"2"],(long)[params valueForKey:@"3"],[self getcurrentHexTimestamp]];
+            }else{
+                cmdData = [NSString stringWithFormat:@"0x000F 0xB0 0xFD 0xC1 0xA0 0x02 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            }
+            break;
+        }
+        case CMD_SET_FRONT_CAM_FRM_RATE:
+        {
+            /*Set_ftcam_fps::  0x09
+             values: 0x01 15Hz 0x02 30Hz 0x03 60Hz 0x04 120Hz*/
+            
+             cmdData = [NSString stringWithFormat:@"0x0010 0xB0 0xFD 0xC2 0xA0 0x09 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_REAR_CAM_MODE:
+        {
+            /*Set_rrcam_mod::  0x04
+             values: 0x01 Stills 0x02 Video*/
+            cmdData = [NSString stringWithFormat:@"0x0011 0xB0 0xFD 0xC2 0xA0 0x04 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_REAR_CAM_RESOLUTION:
+        {
+            /*Set_rrcam_res: 0x02
+             Values: 0x01 VGA 0x02 SVGA 0x03 XGA 0x04 SXGA 0x05 QVGA 0x06 720P 0x07 1080P 0x08 NTSC 0x09 PAL 0x0A User Defined
+             P2. P3
+             Note: The option for “User Defined” resolution can only be chosen in debug mode and if “User Defined” is the chosen, the command must be accompanied by two additional parameters. P2. Res.Horz P3. Res.Vertical
+             */
+            if([[params valueForKey:@"1"] integerValue]==10){
+                cmdData = [NSString stringWithFormat:@"0x0012 0xB0 0xFD 0xC1 0xA0 0x02 0x02%lX%lX%lX040404 0x01 %@",(long)[params valueForKey:@"1"],(long)[params valueForKey:@"2"],(long)[params valueForKey:@"3"],[self getcurrentHexTimestamp]];
+            }else{
+                cmdData = [NSString stringWithFormat:@"0x0012 0xB0 0xFD 0xC1 0xA0 0x02 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            }
+            break;
+        }
+        case CMD_SET_REAR_CAM_FRM_RATE:
+        {
+            /*Set_rrcam_fps::  0x09
+             values: 0x01 15Hz 0x02 30Hz 0x03 60Hz 0x04 120Hz*/
+            
+            cmdData = [NSString stringWithFormat:@"0x0013 0xB0 0xFD 0xC2 0xA0 0x09 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_VISOR_TRANS:
+        {
+            /*Set_Visr_Tranc::  0x05
+             values: 0x00-0xFF */
+            
+            cmdData = [NSString stringWithFormat:@"0x0014 0xB0 0xFD 0xC2 0xA0 0x05 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_VISOR_TRANS_AUTO_ON_OFF:
+        {
+            /*Set_Visr_Atrans: 0x0D ,
+             Values: On/Off */
+            
+            cmdData = [NSString stringWithFormat:@"0x0015 0xB0 0xFD 0xC2 0xA0 0x0D 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_INTELLIGENT_NOISE_CANCELATION_ON_OFF:
+        {
+            /*EnNosSupp: 0x01 ,switches the Ambient Noise Suppression feature on and off,
+             Values: On/Off */
+            
+            cmdData = [NSString stringWithFormat:@"0x0016 0xB0 0xFD 0xC2 0xA0 0x01 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_LAUD_SPK_ON_OFF:
+        {
+            /*EnLouSpk: 0x02 ,This command switches the Loud Speaker on and off,
+             Values: On/Off */
+            
+            cmdData = [NSString stringWithFormat:@"0x0017 0xB0 0xFD 0xC2 0xA0 0x02 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_AMBIENT_NOISE_ON_OFF:
+        {
+            /*EnAmbNosFi: 0x03 ,This command switches the Ambient Noise on and Off,
+             Values: On/Off */
+            
+            cmdData = [NSString stringWithFormat:@"0x0018 0xB0 0xFD 0xC2 0xA0 0x03 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_SIREN_HORN_RECON_ON_OFF:
+        {
+            /*EnHorReq: 0x04 ,This command switches the siren and car horn recognition feature on and off,
+             Values: On/Off */
+            
+            cmdData = [NSString stringWithFormat:@"0x0019 0xB0 0xFD 0xC2 0xA0 0x04 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_OPEN_CHANNEL_ON_OFF:
+        {
+            /*OpnChan: 0xAB ,This command allows the user to open a channel to other helmet wearers,
+             Values: On/Off */
+            
+            cmdData = [NSString stringWithFormat:@"0x001A 0xB0 0xFD 0xC2 0xA0 0xAB 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_SEARCH_OPEN_CHANNEL_ON_OFF:
+        {
+            /*SrchChan: 0xAC ,This command allows the user to search for open channels by other helmet wearers,
+             Values: On/Off */
+            
+            cmdData = [NSString stringWithFormat:@"0x001B 0xB0 0xFD 0xC2 0xA0 0xAC 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_CONN_USER_TO_ID:
+        {
+            /*CntUsr: 0xAF ,This command allows the user to connect or disconnect to other users on open channels. Parameter 1 is used to either connect or disconnect to a user. While parameter 2 is a 4 byte field used to identify the user,
+             Values: 1: On/Off 
+                          2: UserID
+             */
+            
+            cmdData = [NSString stringWithFormat:@"0x001C 0xB0 0xFD 0xC2 0xA0 0xAF 0x02%lX%lX040404 0x01 %@",(long)[params valueForKey:@"1"],(long)[params valueForKey:@"2"],[self getcurrentHexTimestamp]];
             break;
         }
         default:
@@ -298,8 +446,12 @@ static void (^__commandCompletionBlock)(NSError *error);
 #pragma mark - Utility -
 -(NSString*)getcurrentHexTimestamp{
     time_t unixTime = (time_t) [[NSDate date] timeIntervalSince1970];
-    NSString *hexTimeStamp = [NSString stringWithFormat:@"0x%lX",
-                              (unsigned long)unixTime];
+    NSString * timeInMS = [NSString stringWithFormat:@"%lld", [@(floor([[NSDate date] timeIntervalSince1970] * 1000)) longLongValue]];
+//    NSString *hexTimeStamp = [NSString stringWithFormat:@"0x%lX",
+//                              (unsigned long)unixTime];
+    NSString *hexTimeStamp = [NSString stringWithFormat:@"0x%llX",
+                              (unsigned long long)unixTime];
+    
     NSLog(@"%@", hexTimeStamp);
     return hexTimeStamp;
 }
@@ -360,8 +512,8 @@ static void (^__commandCompletionBlock)(NSError *error);
 //        [hexString appendFormat:@"%02x", chars[i]]; /*EDITED PER COMMENT BELOW*/
 //    }
 //    free(chars);
-    NSString *hexString = [NSString stringWithFormat:@"%X",
-                              [stringInput integerValue]];
+    NSString *hexString = [NSString stringWithFormat:@"%lX",
+                              (long)[stringInput integerValue]];
     return hexString;
 }
 @end
