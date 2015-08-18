@@ -87,7 +87,7 @@ static void (^__commandCompletionBlock)(NSError *error);
         if(__scanBlock) __scanBlock(nil);
         
     }else{
-        NSError *err = [NSError errorWithDomain:@"" code:-1001 userInfo:[NSDictionary dictionaryWithObject:@"No SmartHelmet found. Check if SmartHelmet is Power ON and search again." forKey:NSLocalizedDescriptionKey]];
+        NSError *err = [NSError errorWithDomain:@"" code:-1001 userInfo:[NSDictionary dictionaryWithObject:@"No SmartHelmet found. Check if SmartHelmet is Powered ON and search again." forKey:NSLocalizedDescriptionKey]];
         if(__scanBlock) __scanBlock(err);
         
 //        if (str == nil) {
@@ -164,52 +164,52 @@ static void (^__commandCompletionBlock)(NSError *error);
 {
     __commandCompletionBlock = cmdCompletion;
     if(!_isPowerOn){
-        NSError *err = [NSError errorWithDomain:@"" code:-1001 userInfo:[NSDictionary dictionaryWithObject:@"Check if SmartHelmet is Power ON and try again." forKey:NSLocalizedDescriptionKey]];
+        NSError *err = [NSError errorWithDomain:@"" code:-1001 userInfo:[NSDictionary dictionaryWithObject:@"Check if SmartHelmet is Powered ON and try again." forKey:NSLocalizedDescriptionKey]];
         __commandCompletionBlock(err);
         return;
     }
     NSString *cmdData;
     switch (cmd) {
-        case CMD_SET_CYCLING_MODE://Cycling
+        case CMD_SET_SYS_MAIN_MODE://Cycling
         {
-            cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0xA0 0xEC 0x0101040404 0x01 %@",[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0xA0 0xEC 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
             break;
         }
-        case CMD_SET_MOTOSPORT_MODE://Motosport
+//        case CMD_SET_MOTOSPORT_MODE://Motosport
+//        {
+//            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0xA0 0xEC 0x0102040404 0x01 %@",[self getcurrentHexTimestamp]];
+//            break;
+//        }
+//        case CMD_SET_WINTERSPORT_MODE://Wintersport
+//        {
+//            cmdData = [NSString stringWithFormat:@"0x0003 0xB0 0xFD 0xC3 0xA0 0xEC 0x0103040404 0x01 %@",[self getcurrentHexTimestamp]];
+//            break;
+//        }
+//        case CMD_SET_LONGBOARDING_MODE://Longboarding
+//        {
+//            cmdData = [NSString stringWithFormat:@"0x0004 0xB0 0xFD 0xC3 0xA0 0xEC 0x0104040404 0x01 %@",[self getcurrentHexTimestamp]];
+//            break;
+//        }
+//        case CMD_SET_DEBUG_MODE://Debug
+//        {
+//            cmdData = [NSString stringWithFormat:@"0x0005 0xB0 0xFD 0xC3 0xA0 0xEC 0x0105040404 0x01 %@",[self getcurrentHexTimestamp]];
+//            break;
+//        }
+        case CMD_SET_SYS_SUB_MODE://Stunt
         {
-            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0xA0 0xEC 0x0102040404 0x01 %@",[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0xA0 0xEB 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
             break;
         }
-        case CMD_SET_WINTERSPORT_MODE://Wintersport
-        {
-            cmdData = [NSString stringWithFormat:@"0x0003 0xB0 0xFD 0xC3 0xA0 0xEC 0x0103040404 0x01 %@",[self getcurrentHexTimestamp]];
-            break;
-        }
-        case CMD_SET_LONGBOARDING_MODE://Longboarding
-        {
-            cmdData = [NSString stringWithFormat:@"0x0004 0xB0 0xFD 0xC3 0xA0 0xEC 0x0104040404 0x01 %@",[self getcurrentHexTimestamp]];
-            break;
-        }
-        case CMD_SET_DEBUG_MODE://Debug
-        {
-            cmdData = [NSString stringWithFormat:@"0x0005 0xB0 0xFD 0xC3 0xA0 0xEC 0x0105040404 0x01 %@",[self getcurrentHexTimestamp]];
-            break;
-        }
-        case CMD_SET_STUNT_MODE://Stunt
-        {
-            cmdData = [NSString stringWithFormat:@"0x0006 0xB0 0xFD 0xC3 0xA0 0xEB 0x0101040404 0x01 %@",[self getcurrentHexTimestamp]];
-            break;
-        }
-        case CMD_SET_RACE_MODE://Race
-        {
-            cmdData = [NSString stringWithFormat:@"0x0007 0xB0 0xFD 0xC3 0xA0 0xEB 0x0102040404 0x01 %@",[self getcurrentHexTimestamp]];
-            break;
-        }
-        case CMD_SET_COMMUTE_MODE://Commute
-        {
-            cmdData = [NSString stringWithFormat:@"0x0008 0xB0 0xFD 0xC3 0xA0 0xEB 0x0103040404 0x01 %@",[self getcurrentHexTimestamp]];
-            break;
-        }
+//        case CMD_SET_RACE_MODE://Race
+//        {
+//            cmdData = [NSString stringWithFormat:@"0x0007 0xB0 0xFD 0xC3 0xA0 0xEB 0x0102040404 0x01 %@",[self getcurrentHexTimestamp]];
+//            break;
+//        }
+//        case CMD_SET_COMMUTE_MODE://Commute
+//        {
+//            cmdData = [NSString stringWithFormat:@"0x0008 0xB0 0xFD 0xC3 0xA0 0xEB 0x0103040404 0x01 %@",[self getcurrentHexTimestamp]];
+//            break;
+//        }
         case CMD_SET_LED_BRIGHTNESS:
         {
         /*SetLedBriht 0x02 The command sets the Smart Helmet’s LED brightness level.
@@ -445,12 +445,12 @@ static void (^__commandCompletionBlock)(NSError *error);
 }
 #pragma mark - Utility -
 -(NSString*)getcurrentHexTimestamp{
-    time_t unixTime = (time_t) [[NSDate date] timeIntervalSince1970];
+//    time_t unixTime = (time_t) [[NSDate date] timeIntervalSince1970];
     NSString * timeInMS = [NSString stringWithFormat:@"%lld", [@(floor([[NSDate date] timeIntervalSince1970] * 1000)) longLongValue]];
 //    NSString *hexTimeStamp = [NSString stringWithFormat:@"0x%lX",
 //                              (unsigned long)unixTime];
     NSString *hexTimeStamp = [NSString stringWithFormat:@"0x%llX",
-                              (unsigned long long)unixTime];
+                              (unsigned long long)timeInMS];
     
     NSLog(@"%@", hexTimeStamp);
     return hexTimeStamp;
@@ -500,20 +500,24 @@ static void (^__commandCompletionBlock)(NSError *error);
 }
 - (NSString *)stringToHex:(NSString *)stringInput
 {
-//    NSUInteger len = [stringInput length];
-//    unichar *chars = malloc(len * sizeof(unichar));
-//    [stringInput getCharacters:chars];
-//    
-//    NSMutableString *hexString = [[NSMutableString alloc] init];
-//    
-//    for(NSUInteger i = 0; i < len; i++ )
-//    {
-//        // [hexString [NSString stringWithFormat:@"%02x", chars[i]]]; /*previous input*/
-//        [hexString appendFormat:@"%02x", chars[i]]; /*EDITED PER COMMENT BELOW*/
-//    }
-//    free(chars);
     NSString *hexString = [NSString stringWithFormat:@"%lX",
                               (long)[stringInput integerValue]];
     return hexString;
+}
+
+#pragma mark - Save/get user preference/settings -
+//TODO: Secure-NSUserDefaults
+- (void) savePreference:(NSString*)value forKey:(NSString*)key{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setObject:value forKey:key];
+    [defaults synchronize];
+}
+
+- (id) getPreference:(NSString*)key{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    id value = [defaults objectForKey:key];
+    [defaults synchronize];
+
+    return value?value:@"";
 }
 @end

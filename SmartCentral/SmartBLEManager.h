@@ -7,14 +7,16 @@
 
 #import <Foundation/Foundation.h>
 typedef enum {
-    CMD_SET_CYCLING_MODE,
-    CMD_SET_MOTOSPORT_MODE,
-    CMD_SET_WINTERSPORT_MODE,
-    CMD_SET_LONGBOARDING_MODE,
-    CMD_SET_DEBUG_MODE,
-    CMD_SET_STUNT_MODE,
-    CMD_SET_RACE_MODE,
-    CMD_SET_COMMUTE_MODE,
+//    CMD_SET_CYCLING_MODE,
+//    CMD_SET_MOTOSPORT_MODE,
+//    CMD_SET_WINTERSPORT_MODE,
+//    CMD_SET_LONGBOARDING_MODE,
+//    CMD_SET_DEBUG_MODE,
+    CMD_SET_SYS_MAIN_MODE=0,
+//    CMD_SET_STUNT_MODE,
+//    CMD_SET_RACE_MODE,
+//    CMD_SET_COMMUTE_MODE,
+    CMD_SET_SYS_SUB_MODE,
     CMD_SET_LED_BRIGHTNESS,
     CMD_SET_LED_AUTO_ON_OFF,
     CMD_SET_LED_BLINK_RATE,
@@ -37,6 +39,60 @@ typedef enum {
     CMD_SET_CONN_USER_TO_ID
     
 }CMD_TYPE;
+
+typedef enum{
+    CYCLING = 1,
+    MOTOSPORT,
+    WINTERSPORT,
+    LONGBOARDING,
+    DEBUG_MODE
+    
+}SYS_MAIN_MODE;
+
+typedef enum{
+    STUNT = 1,
+    RACE,
+    COMMUTE
+}SYS_SUB_MODE;
+
+typedef enum{
+    OFF = 0,
+    ON
+}STATE;
+
+typedef enum{
+    STILL = 1,
+    VIDEO
+}CAM_MODE;
+
+typedef enum{
+    VGA = 1,
+    SVGA,
+    XGA,
+    SXGA,
+    QVGA,
+    P720,
+    P1080,
+    NTSC,
+    PAL,
+    USER_DEFINE
+    
+}CAM_RESOLUTION;
+
+typedef enum{
+    SLOW = 1,
+    MEDIUM,
+    FAST,
+    FASTEST
+}LED_BLINK_RATE;
+
+typedef enum{
+    Hz15 = 1,
+    Hz30,
+    Hz60,
+    Hz120
+}CAM_FRM_RATE;
+
 @interface SmartBLEManager : NSObject
 
 + (id)sharedManager;

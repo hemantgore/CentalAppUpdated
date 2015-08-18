@@ -512,7 +512,7 @@ NSTimer *rssiTimer;
         case 301://Cycling
         {
 //            cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0x0A 0xEC 0x0101040404 0x01 %@",[self getcurrentHexTimestamp]];
-            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_CYCLING_MODE params:nil completion:^(NSError *error) {
+            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_SYS_MAIN_MODE params:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%d",CYCLING] forKey:@"1"] completion:^(NSError *error) {
                 if(error){
                     NSLog(@"CMD_SET_CYCLING_MODE Fail");
                 }else{
@@ -524,7 +524,7 @@ NSTimer *rssiTimer;
         case 302://Motosport
         {
 //            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0x0A 0xEC 0x0102040404 0x01 %@",[self getcurrentHexTimestamp]];
-            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_MOTOSPORT_MODE params:nil completion:^(NSError *error) {
+            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_SYS_MAIN_MODE params:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%d",WINTERSPORT]forKey:@"1"] completion:^(NSError *error) {
                 if(error){
                     NSLog(@"CMD_SET_MOTOSPORT_MODE Fail");
                 }else{
@@ -536,7 +536,7 @@ NSTimer *rssiTimer;
         case 303://Wintersport
         {
 //            cmdData = [NSString stringWithFormat:@"0x0003 0xB0 0xFD 0xC3 0x0A 0xEC 0x0103040404 0x01 %@",[self getcurrentHexTimestamp]];
-            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_WINTERSPORT_MODE params:nil completion:^(NSError *error) {
+            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_SYS_MAIN_MODE params:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%d",WINTERSPORT] forKey:@"1"] completion:^(NSError *error) {
                 if(error){
                     NSLog(@"CMD_SET_WINTERSPORT_MODE Fail");
                 }else{
@@ -548,7 +548,7 @@ NSTimer *rssiTimer;
         case 304://Longboarding
         {
 //            cmdData = [NSString stringWithFormat:@"0x0004 0xB0 0xFD 0xC3 0x0A 0xEC 0x0104040404 0x01 %@",[self getcurrentHexTimestamp]];
-            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_LONGBOARDING_MODE params:nil completion:^(NSError *error) {
+            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_SYS_MAIN_MODE params:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%d",LONGBOARDING] forKey:@"1"] completion:^(NSError *error) {
                 if(error){
                     NSLog(@"CMD_SET_LONGBOARDING_MODE Fail");
                 }else{
@@ -560,7 +560,7 @@ NSTimer *rssiTimer;
         case 305://Debug
         {
 //            cmdData = [NSString stringWithFormat:@"0x0005 0xB0 0xFD 0xC3 0x0A 0xEC 0x0105040404 0x01 %@",[self getcurrentHexTimestamp]];
-            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_DEBUG_MODE params:nil completion:^(NSError *error) {
+            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_SYS_MAIN_MODE params:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%d",DEBUG_MODE] forKey:@"1"] completion:^(NSError *error) {
                 if(error){
                     NSLog(@"CMD_SET_DEBUG_MODE Fail");
                 }else{
@@ -572,7 +572,7 @@ NSTimer *rssiTimer;
         case 401://Stunt
         {
 //            cmdData = [NSString stringWithFormat:@"0x0006 0xB0 0xFD 0xC3 0x0A 0xEB 0x0101040404 0x01 %@",[self getcurrentHexTimestamp]];
-            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_STUNT_MODE params:nil completion:^(NSError *error) {
+            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_SYS_SUB_MODE params:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%d",STUNT] forKey:@"1"] completion:^(NSError *error) {
                 if(error){
                     NSLog(@"CMD_SET_STUNT_MODE Fail");
                 }else{
@@ -584,7 +584,7 @@ NSTimer *rssiTimer;
         case 402://Race
         {
 //            cmdData = [NSString stringWithFormat:@"0x0007 0xB0 0xFD 0xC3 0x0A 0xEB 0x0102040404 0x01 %@",[self getcurrentHexTimestamp]];
-            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_RACE_MODE params:nil completion:^(NSError *error) {
+            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_SYS_SUB_MODE params:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%d",RACE] forKey:@"1"] completion:^(NSError *error) {
                 if(error){
                     NSLog(@"CMD_SET_RACE_MODE Fail");
                 }else{
@@ -596,7 +596,7 @@ NSTimer *rssiTimer;
         case 403://Commute
         {
 //            cmdData = [NSString stringWithFormat:@"0x0008 0xB0 0xFD 0xC3 0x0A 0xEB 0x0103040404 0x01 %@",[self getcurrentHexTimestamp]];
-            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_COMMUTE_MODE params:nil completion:^(NSError *error) {
+            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_SYS_SUB_MODE params:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%d",COMMUTE] forKey:@"1"] completion:^(NSError *error) {
                 if(error){
                     NSLog(@"CMD_SET_COMMUTE_MODE Fail");
                 }else{
