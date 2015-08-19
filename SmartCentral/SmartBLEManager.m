@@ -170,46 +170,34 @@ static void (^__commandCompletionBlock)(NSError *error);
     }
     NSString *cmdData;
     switch (cmd) {
-        case CMD_SET_SYS_MAIN_MODE://Cycling
+        case CMD_SET_SYS_MAIN_MODE://Main Mode
         {
             cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0xA0 0xEC 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
             break;
         }
-//        case CMD_SET_MOTOSPORT_MODE://Motosport
-//        {
-//            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0xA0 0xEC 0x0102040404 0x01 %@",[self getcurrentHexTimestamp]];
-//            break;
-//        }
-//        case CMD_SET_WINTERSPORT_MODE://Wintersport
-//        {
-//            cmdData = [NSString stringWithFormat:@"0x0003 0xB0 0xFD 0xC3 0xA0 0xEC 0x0103040404 0x01 %@",[self getcurrentHexTimestamp]];
-//            break;
-//        }
-//        case CMD_SET_LONGBOARDING_MODE://Longboarding
-//        {
-//            cmdData = [NSString stringWithFormat:@"0x0004 0xB0 0xFD 0xC3 0xA0 0xEC 0x0104040404 0x01 %@",[self getcurrentHexTimestamp]];
-//            break;
-//        }
-//        case CMD_SET_DEBUG_MODE://Debug
-//        {
-//            cmdData = [NSString stringWithFormat:@"0x0005 0xB0 0xFD 0xC3 0xA0 0xEC 0x0105040404 0x01 %@",[self getcurrentHexTimestamp]];
-//            break;
-//        }
-        case CMD_SET_SYS_SUB_MODE://Stunt
+        case CMD_SET_DEBUG_PASS:
+        {
+            /*ActDebugMod: 0xE6 ,This command activates “Debug Mode” and is accompanied by a six character password. These six values act as the commands parameters,
+             Values: The password value is 335687942
+             */
+            
+            cmdData = [NSString stringWithFormat:@"0x001C 0xB0 0xFD 0xC3 0xA0 0xE6 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_SYS_SUB_MODE://Sub Mode
         {
             cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0xA0 0xEB 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
             break;
         }
-//        case CMD_SET_RACE_MODE://Race
-//        {
-//            cmdData = [NSString stringWithFormat:@"0x0007 0xB0 0xFD 0xC3 0xA0 0xEB 0x0102040404 0x01 %@",[self getcurrentHexTimestamp]];
-//            break;
-//        }
-//        case CMD_SET_COMMUTE_MODE://Commute
-//        {
-//            cmdData = [NSString stringWithFormat:@"0x0008 0xB0 0xFD 0xC3 0xA0 0xEB 0x0103040404 0x01 %@",[self getcurrentHexTimestamp]];
-//            break;
-//        }
+        case CMD_SET_CORE_FAN_SPEED:
+        {
+            /*ActCorFan 0x1B ,This command sets the Core fan on/off option. Parameter 1 is used as an address to target the appropriate fan, parameter 2 is used to set the speed of the fan
+             Values: 1. 0x0A
+                          2. 0x00-0xFF         
+             */
+            cmdData = [NSString stringWithFormat:@"0x0009 0xB0 0xFD 0xC1 0xA0 0x1B 0x02%lX%lX040404 0x01 %@",(long)[params valueForKey:@"1"],(long)[params valueForKey:@"2"],[self getcurrentHexTimestamp]];
+            break;
+        }
         case CMD_SET_LED_BRIGHTNESS:
         {
         /*SetLedBriht 0x02 The command sets the Smart Helmet’s LED brightness level.
@@ -226,9 +214,33 @@ static void (^__commandCompletionBlock)(NSError *error);
         }
         case CMD_SET_LED_BLINK_RATE:
         {
-            /*SetBlnkRat 0x03 his command sets the LED blink rate for turn signals, emergency braking and hazard lights.
+            /*SetBlnkRat 0x03 This command sets the LED blink rate for turn signals, emergency braking and hazard lights.
              Values: 0x01 - Slow 0x02 - Medium 0x03 - Fast 0x04 - Fastest       */
             cmdData = [NSString stringWithFormat:@"0x000B 0xB0 0xFD 0xC1 0xA0 0x03 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_HAZARD_LIGHT_ON_OFF:
+        {
+            /*ActHazLits: 0x07 This command switches the hazard light function on or off
+            Values: 0x00 - OFF, 0x01 - ON       
+             */
+            cmdData = [NSString stringWithFormat:@"0x000B 0xB0 0xFD 0xC1 0xA0 0x07 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_STANDBY_ON_OFF:
+        {
+            /*Standby: 0xAB This command puts the Smart Helmet into Power Save Mode
+             Values: 0x00 - OFF, 0x01 - ON
+             */
+            cmdData = [NSString stringWithFormat:@"0x000B 0xB0 0xFD 0xC1 0xA0 0xAB 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_PWR_ON_OFF:
+        {
+            /*PwrDwn: 0xBB This command turns the Smart Helmet’s power on or off
+             Values: 0x00 - OFF, 0x01 - ON
+             */
+            cmdData = [NSString stringWithFormat:@"0x000B 0xB0 0xFD 0xC1 0xA0 0xBB 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_FRONT_CAM_ON_OFF:
@@ -374,6 +386,108 @@ static void (^__commandCompletionBlock)(NSError *error);
              */
             
             cmdData = [NSString stringWithFormat:@"0x001C 0xB0 0xFD 0xC2 0xA0 0xAF 0x02%lX%lX040404 0x01 %@",(long)[params valueForKey:@"1"],(long)[params valueForKey:@"2"],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_GET_CURRENT_SPEED:
+        {
+            /*GetSpd: 0x11 ,Get current speed of the Smart Helmet,
+             Values:
+             */
+            cmdData = [NSString stringWithFormat:@"0x001C 0xB0 0xFD 0xC0 0xA1 0x11 0x0000040404 0x01 %@",[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_GET_CURRENT_DATE:
+        {
+            /*GetDate: 0x0A ,Get current Date of the Smart Helmet's Navigation VCS,
+             Values:
+             */
+            cmdData = [NSString stringWithFormat:@"0x001C 0xB0 0xFD 0xC0 0xA1 0x1A 0x0000040404 0x01 %@",[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_GET_CURRENT_TIME:
+        {
+            /*GetTime: 0x0B ,Get current Time of the Smart Helmet's Navigation VCS,
+             Values:
+             */
+            cmdData = [NSString stringWithFormat:@"0x001C 0xB0 0xFD 0xC0 0xA1 0x1B 0x0000040404 0x01 %@",[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_GET_DIRECTION:
+        {
+            /*GetDir: 0x0C ,Get current Direction of the Smart Helmet's Navigation VCS,
+             Values:
+             */
+            cmdData = [NSString stringWithFormat:@"0x001C 0xB0 0xFD 0xC0 0xA1 0x1C 0x0000040404 0x01 %@",[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_GET_LOCATION:
+        {
+            /*GetLoc: 0x0D ,Get current Location of the Smart Helmet's Navigation VCS,
+             Values:
+             */
+            cmdData = [NSString stringWithFormat:@"0x001C 0xB0 0xFD 0xC0 0xA1 0x1D 0x0000040404 0x01 %@",[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_GET_ESTIMATED_TRAVEL_TIME:
+        {
+            /*GetETT: 0x0E ,This command retrieves the current Estimated Travel Time. This time value is computed using the current distance to the target waypoint and the current speed,
+             Values:
+             */
+            cmdData = [NSString stringWithFormat:@"0x001C 0xB0 0xFD 0xC0 0xA1 0x1D 0x0000040404 0x01 %@",[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_GET_ACCELRATION:
+        {
+            /*GAccel: 0x01-0x03 ,This command retrieves the vehicles acceleration along Given Axis, and returns the value in ft/s
+             Values: ACCELRATION
+             */
+            cmdData = [NSString stringWithFormat:@"0x001C 0xB0 0xFD 0xC0 0xA1 0x%lX 0x0000040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_GET_ANGULAR_VELOCITY:
+        {
+            /*GAnguV: 0x04-0x06 ,This command retrieves the vehicles angular velocity along the X axis, and returns the value in degs/s
+             Values: ANGULAR_VELOCITY
+             */
+            cmdData = [NSString stringWithFormat:@"0x001C 0xB0 0xFD 0xC0 0xA1 0x%lX 0x0000040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_GET_PITCH_ANGLE:
+        {
+            /*GPitch: 0x07 ,This command retrieves the vehicle’s pitch angle, and returns the value in degrees
+             Values:
+             */
+            cmdData = [NSString stringWithFormat:@"0x001C 0xB0 0xFD 0xC0 0xA1 0x07 0x0000040404 0x01 %@",[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_GET_ROLL_ANGLE:
+        {
+            /*GRoll: 0x08 ,This command retrieves the vehicle’s roll angle, and returns the value in degrees
+             Values:
+             */
+            cmdData = [NSString stringWithFormat:@"0x001C 0xB0 0xFD 0xC0 0xA1 0x08 0x0000040404 0x01 %@",[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_GET_YAW_ANGLE:
+        {
+            /*GYaw: 0x09,This command retrieves the vehicle’s yaw angle, and returns the value in degree.
+             Values:
+             */
+            cmdData = [NSString stringWithFormat:@"0x001C 0xB0 0xFD 0xC0 0xA1 0x09 0x0000040404 0x01 %@",[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_GET_BATTERY_LIFE:
+        {
+            /*GetBatLif: 0x01 ,This command retrieves the Battery life from the Electrical VCS
+             Values:          */
+            cmdData = [NSString stringWithFormat:@"0x0009 0xB0 0xFD 0xC1 0xA2 0x01 0x0000040404 0x01 %@",[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_ACTION_CAL_TEMP_SNR:
+        {
+            /*CalTemSnr 0x1A ,Action, This command calibrates the ambient temperature sensor. Only allowed in debug mode
+             Values:          */
+            cmdData = [NSString stringWithFormat:@"0x0009 0xB0 0xFD 0xC1 0xA2 0x1A 0x0000040404 0x01 %@",[self getcurrentHexTimestamp]];
             break;
         }
         default:
