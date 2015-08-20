@@ -189,9 +189,54 @@ static void (^__commandCompletionBlock)(NSError *error);
             cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0xA0 0xEB 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
             break;
         }
+        case CMD_SET_NAV_VCS_ON_OFF:
+        {
+            /*SetNavInfoStat: 0xEE ,    The command activates/deactivates the navigation VCS’ informational messages logging routine. Only allowed in debug mode
+             Value: on/off
+             */
+            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0xA0 0xEE 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_IMGINFO_VCS_ON_OFF:
+        {
+            /*SetImgInfoStat: 0xEA ,    The command activates/deactivates the navigation VCS’ informational messages logging routine. Only allowed in debug mode
+             Value: on/off
+             */
+            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0xA0 0xEA 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_ELEINFO_VCS_ON_OFF:
+        {
+            /*SetEleInfoStat: 0xEF ,    The command activates/deactivates the navigation VCS’ informational messages logging routine. Only allowed in debug mode 
+             Value: on/off
+             */
+            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0xA0 0xEF 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_ACTION_RUN_DIAG_REP:
+        {
+            /*RunDiagRep: 0xDE ,    This Command initiates the run diagnostic report routine. The file data will be returned in an acknowledgement message in the MSGRESP field. Only allowed in debug mode
+             */
+            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0xA2 0xDE 0x0101040404 0x01 %@",[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_ACTION_RUN_DATA_REP:
+        {
+            /*RunDataRep: 0xDF ,    This Command initiates the run data report routine. The file data will be returned in an acknowledgement message in the MSGRESP field. Only allowed in debug mode
+             */
+            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0xA2 0xDF 0x0101040404 0x01 %@",[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_ACTION_OPEN_DEBUG_PORL:
+        {
+            /*RunDataRep: 0xDF ,    This Command initiates the run data report routine. The file data will be returned in an acknowledgement message in the MSGRESP field. Only allowed in debug mode
+             */
+            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0xA2 0xDF 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            break;
+        }
         case CMD_SET_CORE_FAN_SPEED:
         {
-            /*ActCorFan 0x1B ,This command sets the Core fan on/off option. Parameter 1 is used as an address to target the appropriate fan, parameter 2 is used to set the speed of the fan
+            /*OpnDebugPor: 0xE0 ,This command activates the debug portal in the embedded system. It is only allowed in debug mode
              Values: 1. 0x0A
                           2. 0x00-0xFF         
              */
@@ -388,6 +433,7 @@ static void (^__commandCompletionBlock)(NSError *error);
             cmdData = [NSString stringWithFormat:@"0x001C 0xB0 0xFD 0xC2 0xA0 0xAF 0x02%lX%lX040404 0x01 %@",(long)[params valueForKey:@"1"],(long)[params valueForKey:@"2"],[self getcurrentHexTimestamp]];
             break;
         }
+        
         case CMD_GET_CURRENT_SPEED:
         {
             /*GetSpd: 0x11 ,Get current speed of the Smart Helmet,
@@ -490,6 +536,7 @@ static void (^__commandCompletionBlock)(NSError *error);
             cmdData = [NSString stringWithFormat:@"0x0009 0xB0 0xFD 0xC1 0xA2 0x1A 0x0000040404 0x01 %@",[self getcurrentHexTimestamp]];
             break;
         }
+        
         default:
             break;
     }
