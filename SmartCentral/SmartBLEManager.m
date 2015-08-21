@@ -172,7 +172,7 @@ static void (^__commandCompletionBlock)(NSError *error);
     switch (cmd) {
         case CMD_SET_SYS_MAIN_MODE://Main Mode
         {
-            cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0xA0 0xEC 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0001 0xB0 0xFD 0xC3 0xA0 0xEC 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_DEBUG_PASS:
@@ -606,14 +606,17 @@ static void (^__commandCompletionBlock)(NSError *error);
 }
 #pragma mark - Utility -
 -(NSString*)getcurrentHexTimestamp{
-//    time_t unixTime = (time_t) [[NSDate date] timeIntervalSince1970];
+    time_t unixTime = (time_t) [[NSDate date] timeIntervalSince1970];
     NSString * timeInMS = [NSString stringWithFormat:@"%lld", [@(floor([[NSDate date] timeIntervalSince1970] * 1000)) longLongValue]];
-//    NSString *hexTimeStamp = [NSString stringWithFormat:@"0x%lX",
-//                              (unsigned long)unixTime];
+    NSString *hexTimeStamp1 = [NSString stringWithFormat:@"0x%lX",
+                              (unsigned long)unixTime];
     NSString *hexTimeStamp = [NSString stringWithFormat:@"0x%llX",
                               (unsigned long long)timeInMS];
     
+    
+    NSLog(@"%@", timeInMS);
     NSLog(@"%@", hexTimeStamp);
+    NSLog(@"%@", hexTimeStamp1);
     return hexTimeStamp;
 }
 
@@ -661,8 +664,8 @@ static void (^__commandCompletionBlock)(NSError *error);
 }
 - (NSString *)stringToHex:(NSString *)stringInput
 {
-    NSString *hexString = [NSString stringWithFormat:@"%lX",
-                              (long)[stringInput integerValue]];
+    NSString *hexString = [NSString stringWithFormat:@"0%X",
+                              (unsigned int)[stringInput integerValue]];
     return hexString;
 }
 

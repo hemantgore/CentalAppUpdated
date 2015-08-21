@@ -73,7 +73,7 @@ typedef enum{
 
 typedef enum{
     OFF = 0,
-    ON
+    ON =1
 }STATE;
 
 typedef enum{
