@@ -19,6 +19,7 @@ static void (^__commandCompletionBlock)(NSError *error);
 {
      MelodyManager *melodyManager;
      NSMutableArray *_objects;
+    NSDateFormatter *dateFormatter;
 }
 @property (strong,    nonatomic)    MelodySmart  *melodySmart;
 @property (strong,    nonatomic)    NSData       *dataToSend;
@@ -50,6 +51,7 @@ static void (^__commandCompletionBlock)(NSError *error);
         melodyManager = [MelodyManager new];
         [melodyManager setForService:nil andDataCharacterisitc:nil andPioReportCharacteristic:nil andPioSettingCharacteristic:nil];
         melodyManager.delegate = self;
+        dateFormatter = [[NSDateFormatter alloc] init];
     }
     return self;
 }
@@ -181,12 +183,12 @@ static void (^__commandCompletionBlock)(NSError *error);
              Values: The password value is 335687942
              */
             
-            cmdData = [NSString stringWithFormat:@"0x001C 0xB0 0xFD 0xC3 0xA0 0xE6 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x001C 0xB0 0xFD 0xC3 0xA0 0xE6 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_SYS_SUB_MODE://Sub Mode
         {
-            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0xA0 0xEB 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0xA0 0xEB 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_NAV_VCS_ON_OFF:
@@ -194,7 +196,7 @@ static void (^__commandCompletionBlock)(NSError *error);
             /*SetNavInfoStat: 0xEE ,    The command activates/deactivates the navigation VCS’ informational messages logging routine. Only allowed in debug mode
              Value: on/off
              */
-            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0xA0 0xEE 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0xA0 0xEE 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_IMGINFO_VCS_ON_OFF:
@@ -202,7 +204,7 @@ static void (^__commandCompletionBlock)(NSError *error);
             /*SetImgInfoStat: 0xEA ,    The command activates/deactivates the navigation VCS’ informational messages logging routine. Only allowed in debug mode
              Value: on/off
              */
-            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0xA0 0xEA 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0xA0 0xEA 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_ELEINFO_VCS_ON_OFF:
@@ -210,7 +212,7 @@ static void (^__commandCompletionBlock)(NSError *error);
             /*SetEleInfoStat: 0xEF ,    The command activates/deactivates the navigation VCS’ informational messages logging routine. Only allowed in debug mode 
              Value: on/off
              */
-            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0xA0 0xEF 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0xA0 0xEF 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_ACTION_RUN_DIAG_REP:
@@ -231,7 +233,7 @@ static void (^__commandCompletionBlock)(NSError *error);
         {
             /*RunDataRep: 0xDF ,    This Command initiates the run data report routine. The file data will be returned in an acknowledgement message in the MSGRESP field. Only allowed in debug mode
              */
-            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0xA2 0xDF 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0xA2 0xDF 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_CORE_FAN_SPEED:
@@ -240,28 +242,28 @@ static void (^__commandCompletionBlock)(NSError *error);
              Values: 1. 0x0A
                           2. 0x00-0xFF         
              */
-            cmdData = [NSString stringWithFormat:@"0x0009 0xB0 0xFD 0xC1 0xA0 0x1B 0x02%lX%lX040404 0x01 %@",(long)[params valueForKey:@"1"],(long)[params valueForKey:@"2"],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0009 0xB0 0xFD 0xC1 0xA0 0x1B 0x02%@%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self stringToHex:[params valueForKey:@"2"]],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_LED_BRIGHTNESS:
         {
         /*SetLedBriht 0x02 The command sets the Smart Helmet’s LED brightness level.
         Values: 0x00 – 0xFF         */
-            cmdData = [NSString stringWithFormat:@"0x0009 0xB0 0xFD 0xC1 0xA0 0x02 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0009 0xB0 0xFD 0xC1 0xA0 0x02 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_LED_AUTO_ON_OFF:
         {
             /*ActAutoLits 0x09 The command switches the Autonomous lighting system on or off.
              Values: On/Off i.e 0x01 or 0x00         */
-            cmdData = [NSString stringWithFormat:@"0x000A 0xB0 0xFD 0xC1 0xA0 0x09 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x000A 0xB0 0xFD 0xC1 0xA0 0x09 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_LED_BLINK_RATE:
         {
             /*SetBlnkRat 0x03 This command sets the LED blink rate for turn signals, emergency braking and hazard lights.
              Values: 0x01 - Slow 0x02 - Medium 0x03 - Fast 0x04 - Fastest       */
-            cmdData = [NSString stringWithFormat:@"0x000B 0xB0 0xFD 0xC1 0xA0 0x03 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x000B 0xB0 0xFD 0xC1 0xA0 0x03 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_HAZARD_LIGHT_ON_OFF:
@@ -269,7 +271,7 @@ static void (^__commandCompletionBlock)(NSError *error);
             /*ActHazLits: 0x07 This command switches the hazard light function on or off
             Values: 0x00 - OFF, 0x01 - ON       
              */
-            cmdData = [NSString stringWithFormat:@"0x000B 0xB0 0xFD 0xC1 0xA0 0x07 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x000B 0xB0 0xFD 0xC1 0xA0 0x07 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_STANDBY_ON_OFF:
@@ -277,7 +279,7 @@ static void (^__commandCompletionBlock)(NSError *error);
             /*Standby: 0xAB This command puts the Smart Helmet into Power Save Mode
              Values: 0x00 - OFF, 0x01 - ON
              */
-            cmdData = [NSString stringWithFormat:@"0x000B 0xB0 0xFD 0xC1 0xA0 0xAB 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x000B 0xB0 0xFD 0xC1 0xA0 0xAB 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_PWR_ON_OFF:
@@ -285,27 +287,27 @@ static void (^__commandCompletionBlock)(NSError *error);
             /*PwrDwn: 0xBB This command turns the Smart Helmet’s power on or off
              Values: 0x00 - OFF, 0x01 - ON
              */
-            cmdData = [NSString stringWithFormat:@"0x000B 0xB0 0xFD 0xC1 0xA0 0xBB 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x000B 0xB0 0xFD 0xC1 0xA0 0xBB 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_FRONT_CAM_ON_OFF:
         {
             /*Set_ftcam_act: 0x0C
              VAlues: on/off */
-            cmdData = [NSString stringWithFormat:@"0x000C 0xB0 0xFD 0xC2 0xA0 0x0C 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x000C 0xB0 0xFD 0xC2 0xA0 0x0C 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_REAR_CAM_ON_OFF:
         {
             /*Set_rrcam_act:0x0D*/
-            cmdData = [NSString stringWithFormat:@"0x000D 0xB0 0xFD 0xC2 0xA0 0x0D 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x000D 0xB0 0xFD 0xC2 0xA0 0x0D 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_FRONT_CAM_MODE:
         {
             /*Set_ftcam_mod::  0x03
              values: 0x01 Stills 0x02 Video*/
-            cmdData = [NSString stringWithFormat:@"0x000E 0xB0 0xFD 0xC2 0xA0 0x03 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x000E 0xB0 0xFD 0xC2 0xA0 0x03 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_FRONT_CAM_RESOLUTION:
@@ -316,9 +318,9 @@ static void (^__commandCompletionBlock)(NSError *error);
              Note: The option for “User Defined” resolution can only be chosen in debug mode and if “User Defined” is the chosen, the command must be accompanied by two additional parameters. P2. Res.Horz P3. Res.Vertical
              */
             if([[params valueForKey:@"1"] integerValue]==10){
-                cmdData = [NSString stringWithFormat:@"0x000F 0xB0 0xFD 0xC1 0xA0 0x01 0x02%lX%lX%lX040404 0x01 %@",(long)[params valueForKey:@"1"],(long)[params valueForKey:@"2"],(long)[params valueForKey:@"3"],[self getcurrentHexTimestamp]];
+                cmdData = [NSString stringWithFormat:@"0x000F 0xB0 0xFD 0xC1 0xA0 0x01 0x02%@%@%lX040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self stringToHex:[params valueForKey:@"2"]],(long)[params valueForKey:@"3"],[self getcurrentHexTimestamp]];
             }else{
-                cmdData = [NSString stringWithFormat:@"0x000F 0xB0 0xFD 0xC1 0xA0 0x02 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+                cmdData = [NSString stringWithFormat:@"0x000F 0xB0 0xFD 0xC1 0xA0 0x02 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             }
             break;
         }
@@ -327,14 +329,14 @@ static void (^__commandCompletionBlock)(NSError *error);
             /*Set_ftcam_fps::  0x09
              values: 0x01 15Hz 0x02 30Hz 0x03 60Hz 0x04 120Hz*/
             
-             cmdData = [NSString stringWithFormat:@"0x0010 0xB0 0xFD 0xC2 0xA0 0x09 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+             cmdData = [NSString stringWithFormat:@"0x0010 0xB0 0xFD 0xC2 0xA0 0x09 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_REAR_CAM_MODE:
         {
             /*Set_rrcam_mod::  0x04
              values: 0x01 Stills 0x02 Video*/
-            cmdData = [NSString stringWithFormat:@"0x0011 0xB0 0xFD 0xC2 0xA0 0x04 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0011 0xB0 0xFD 0xC2 0xA0 0x04 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_REAR_CAM_RESOLUTION:
@@ -345,9 +347,9 @@ static void (^__commandCompletionBlock)(NSError *error);
              Note: The option for “User Defined” resolution can only be chosen in debug mode and if “User Defined” is the chosen, the command must be accompanied by two additional parameters. P2. Res.Horz P3. Res.Vertical
              */
             if([[params valueForKey:@"1"] integerValue]==10){
-                cmdData = [NSString stringWithFormat:@"0x0012 0xB0 0xFD 0xC1 0xA0 0x02 0x02%lX%lX%lX040404 0x01 %@",(long)[params valueForKey:@"1"],(long)[params valueForKey:@"2"],(long)[params valueForKey:@"3"],[self getcurrentHexTimestamp]];
+                cmdData = [NSString stringWithFormat:@"0x0012 0xB0 0xFD 0xC1 0xA0 0x02 0x02%@%@%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self stringToHex:[params valueForKey:@"2"]],[self stringToHex:[params valueForKey:@"3"]],[self getcurrentHexTimestamp]];
             }else{
-                cmdData = [NSString stringWithFormat:@"0x0012 0xB0 0xFD 0xC1 0xA0 0x02 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+                cmdData = [NSString stringWithFormat:@"0x0012 0xB0 0xFD 0xC1 0xA0 0x02 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             }
             break;
         }
@@ -356,7 +358,7 @@ static void (^__commandCompletionBlock)(NSError *error);
             /*Set_rrcam_fps::  0x09
              values: 0x01 15Hz 0x02 30Hz 0x03 60Hz 0x04 120Hz*/
             
-            cmdData = [NSString stringWithFormat:@"0x0013 0xB0 0xFD 0xC2 0xA0 0x09 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0013 0xB0 0xFD 0xC2 0xA0 0x09 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_VISOR_TRANS:
@@ -364,7 +366,7 @@ static void (^__commandCompletionBlock)(NSError *error);
             /*Set_Visr_Tranc::  0x05
              values: 0x00-0xFF */
             
-            cmdData = [NSString stringWithFormat:@"0x0014 0xB0 0xFD 0xC2 0xA0 0x05 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0014 0xB0 0xFD 0xC2 0xA0 0x05 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_VISOR_TRANS_AUTO_ON_OFF:
@@ -372,7 +374,7 @@ static void (^__commandCompletionBlock)(NSError *error);
             /*Set_Visr_Atrans: 0x0D ,
              Values: On/Off */
             
-            cmdData = [NSString stringWithFormat:@"0x0015 0xB0 0xFD 0xC2 0xA0 0x0D 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0015 0xB0 0xFD 0xC2 0xA0 0x0D 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_INTELLIGENT_NOISE_CANCELATION_ON_OFF:
@@ -380,7 +382,7 @@ static void (^__commandCompletionBlock)(NSError *error);
             /*EnNosSupp: 0x01 ,switches the Ambient Noise Suppression feature on and off,
              Values: On/Off */
             
-            cmdData = [NSString stringWithFormat:@"0x0016 0xB0 0xFD 0xC2 0xA0 0x01 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0016 0xB0 0xFD 0xC2 0xA0 0x01 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_LAUD_SPK_ON_OFF:
@@ -388,7 +390,7 @@ static void (^__commandCompletionBlock)(NSError *error);
             /*EnLouSpk: 0x02 ,This command switches the Loud Speaker on and off,
              Values: On/Off */
             
-            cmdData = [NSString stringWithFormat:@"0x0017 0xB0 0xFD 0xC2 0xA0 0x02 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0017 0xB0 0xFD 0xC2 0xA0 0x02 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_AMBIENT_NOISE_ON_OFF:
@@ -396,7 +398,7 @@ static void (^__commandCompletionBlock)(NSError *error);
             /*EnAmbNosFi: 0x03 ,This command switches the Ambient Noise on and Off,
              Values: On/Off */
             
-            cmdData = [NSString stringWithFormat:@"0x0018 0xB0 0xFD 0xC2 0xA0 0x03 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0018 0xB0 0xFD 0xC2 0xA0 0x03 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_SIREN_HORN_RECON_ON_OFF:
@@ -404,7 +406,7 @@ static void (^__commandCompletionBlock)(NSError *error);
             /*EnHorReq: 0x04 ,This command switches the siren and car horn recognition feature on and off,
              Values: On/Off */
             
-            cmdData = [NSString stringWithFormat:@"0x0019 0xB0 0xFD 0xC2 0xA0 0x04 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0019 0xB0 0xFD 0xC2 0xA0 0x04 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_OPEN_CHANNEL_ON_OFF:
@@ -412,7 +414,7 @@ static void (^__commandCompletionBlock)(NSError *error);
             /*OpnChan: 0xAB ,This command allows the user to open a channel to other helmet wearers,
              Values: On/Off */
             
-            cmdData = [NSString stringWithFormat:@"0x001A 0xB0 0xFD 0xC2 0xA0 0xAB 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x001A 0xB0 0xFD 0xC2 0xA0 0xAB 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_SEARCH_OPEN_CHANNEL_ON_OFF:
@@ -420,7 +422,7 @@ static void (^__commandCompletionBlock)(NSError *error);
             /*SrchChan: 0xAC ,This command allows the user to search for open channels by other helmet wearers,
              Values: On/Off */
             
-            cmdData = [NSString stringWithFormat:@"0x001B 0xB0 0xFD 0xC2 0xA0 0xAC 0x01%lX040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x001B 0xB0 0xFD 0xC2 0xA0 0xAC 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_SET_CONN_USER_TO_ID:
@@ -430,7 +432,7 @@ static void (^__commandCompletionBlock)(NSError *error);
                           2: UserID
              */
             
-            cmdData = [NSString stringWithFormat:@"0x001C 0xB0 0xFD 0xC2 0xA0 0xAF 0x02%lX%lX040404 0x01 %@",(long)[params valueForKey:@"1"],(long)[params valueForKey:@"2"],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x001C 0xB0 0xFD 0xC2 0xA0 0xAF 0x02%@%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self stringToHex:[params valueForKey:@"2"]],[self getcurrentHexTimestamp]];
             break;
         }
         
@@ -487,7 +489,7 @@ static void (^__commandCompletionBlock)(NSError *error);
             /*GAccel: 0x01-0x03 ,This command retrieves the vehicles acceleration along Given Axis, and returns the value in ft/s
              Values: ACCELRATION
              */
-            cmdData = [NSString stringWithFormat:@"0x001C 0xB0 0xFD 0xC0 0xA1 0x%lX 0x0000040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x001C 0xB0 0xFD 0xC0 0xA1 0x%@ 0x0000040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_GET_ANGULAR_VELOCITY:
@@ -495,7 +497,7 @@ static void (^__commandCompletionBlock)(NSError *error);
             /*GAnguV: 0x04-0x06 ,This command retrieves the vehicles angular velocity along the X axis, and returns the value in degs/s
              Values: ANGULAR_VELOCITY
              */
-            cmdData = [NSString stringWithFormat:@"0x001C 0xB0 0xFD 0xC0 0xA1 0x%lX 0x0000040404 0x01 %@",(long)[params valueForKey:@"1"],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x001C 0xB0 0xFD 0xC0 0xA1 0x%@ 0x0000040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             break;
         }
         case CMD_GET_PITCH_ANGLE:
@@ -606,17 +608,27 @@ static void (^__commandCompletionBlock)(NSError *error);
 }
 #pragma mark - Utility -
 -(NSString*)getcurrentHexTimestamp{
-    time_t unixTime = (time_t) [[NSDate date] timeIntervalSince1970];
-    NSString * timeInMS = [NSString stringWithFormat:@"%lld", [@(floor([[NSDate date] timeIntervalSince1970] * 1000)) longLongValue]];
-    NSString *hexTimeStamp1 = [NSString stringWithFormat:@"0x%lX",
-                              (unsigned long)unixTime];
-    NSString *hexTimeStamp = [NSString stringWithFormat:@"0x%llX",
-                              (unsigned long long)timeInMS];
+//    time_t unixTime = (time_t) [[NSDate date] timeIntervalSince1970];
+//    NSString * timeInMS = [NSString stringWithFormat:@"%lld", [@(floor([[NSDate date] timeIntervalSince1970] * 1000)) longLongValue]];
+//    NSString *hexTimeStamp1 = [NSString stringWithFormat:@"0x%lX",
+//                              (unsigned long)unixTime];
+//    NSString *hexTimeStamp = [NSString stringWithFormat:@"0x%llX",
+//                              (unsigned long long)timeInMS];
+//    
+//    
+//    NSLog(@"%@", timeInMS);
+//    NSLog(@"%@", hexTimeStamp);
+//    NSLog(@"%@", hexTimeStamp1);
+    [dateFormatter setDateFormat:@"HH:mm:ss:SS"];
     
+    NSDate *date = [NSDate date];
     
-    NSLog(@"%@", timeInMS);
-    NSLog(@"%@", hexTimeStamp);
-    NSLog(@"%@", hexTimeStamp1);
+    NSString *formattedDateString = [dateFormatter stringFromDate:date];
+    NSLog(@"formattedDateString: %@", formattedDateString);
+    NSArray *timeArray = [formattedDateString componentsSeparatedByString:@":"];
+    NSString *hexTimeStamp = [NSString stringWithFormat:@"0x%02lX%02lX%02lX%02lX",
+                              (long)[[timeArray objectAtIndex:0] integerValue],(long)[[timeArray objectAtIndex:1] integerValue],(long)[[timeArray objectAtIndex:2] integerValue],(long)[[timeArray objectAtIndex:3] integerValue]];
+    NSLog(@"hexTimeStamp:%@", hexTimeStamp);
     return hexTimeStamp;
 }
 
@@ -664,8 +676,8 @@ static void (^__commandCompletionBlock)(NSError *error);
 }
 - (NSString *)stringToHex:(NSString *)stringInput
 {
-    NSString *hexString = [NSString stringWithFormat:@"0%X",
-                              (unsigned int)[stringInput integerValue]];
+    NSString *hexString = [NSString stringWithFormat:@"%02lX",
+                              (long)[stringInput integerValue]];
     return hexString;
 }
 
