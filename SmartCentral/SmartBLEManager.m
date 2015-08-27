@@ -231,20 +231,20 @@ static void (^__commandCompletionBlock)(NSError *error);
         }
         case CMD_ACTION_OPEN_DEBUG_PORL:
         {
-            /*RunDataRep: 0xDF ,    This Command initiates the run data report routine. The file data will be returned in an acknowledgement message in the MSGRESP field. Only allowed in debug mode
+            /*OpnDebugPor: 0xE0 ,    This Command initiates the run data report routine. The file data will be returned in an acknowledgement message in the MSGRESP field. Only allowed in debug mode
              */
-            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0xA2 0xDF 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
+            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0xA2 0xE0 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
             break;
         }
-        case CMD_SET_CORE_FAN_SPEED:
-        {
-            /*OpnDebugPor: 0xE0 ,This command activates the debug portal in the embedded system. It is only allowed in debug mode
-             Values: 1. 0x0A
-                          2. 0x00-0xFF         
-             */
-            cmdData = [NSString stringWithFormat:@"0x0009 0xB0 0xFD 0xC1 0xA0 0x1B 0x02%@%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self stringToHex:[params valueForKey:@"2"]],[self getcurrentHexTimestamp]];
-            break;
-        }
+//        case CMD_SET_CORE_FAN_SPEED:
+//        {
+//            /*OpnDebugPor: 0x1B ,This command activates the debug portal in the embedded system. It is only allowed in debug mode
+//             Values: 1. 0x0A
+//                          2. 0x00-0xFF         
+//             */
+//            cmdData = [NSString stringWithFormat:@"0x0009 0xB0 0xFD 0xC1 0xA0 0x1B 0x02%@%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self stringToHex:[params valueForKey:@"2"]],[self getcurrentHexTimestamp]];
+//            break;
+//        }
         case CMD_SET_LED_BRIGHTNESS:
         {
         /*SetLedBriht 0x02 The command sets the Smart Helmet’s LED brightness level.
@@ -538,7 +538,58 @@ static void (^__commandCompletionBlock)(NSError *error);
             cmdData = [NSString stringWithFormat:@"0x0009 0xB0 0xFD 0xC1 0xA2 0x1A 0x0000040404 0x01 %@",[self getcurrentHexTimestamp]];
             break;
         }
-        
+        case CMD_SET_VENT_MODE:
+        {
+            /*SetVentMod 0x1B ,Set, This command sets the ventilation mode
+             Values: 00. FAN OFF, 01. AUTO MODE, 02. MANUAL
+             */
+            cmdData = [NSString stringWithFormat:@"0x0009 0xB0 0xFD 0xC1 0xA0 0x1B 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_VENT_FAN_SPEED:
+        {
+            /*SetFanSpd 0x1C ,Set, This command sets the ventilation fan speed.
+             Values: There is one parameter which ranges from 0-255.
+             */
+            cmdData = [NSString stringWithFormat:@"0x0009 0xB0 0xFD 0xC1 0xA0 0x1C 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_TEMP_THRESHOLD:
+        {
+            /*SetTemp 0x1E ,Set, This command sets the temperature threshold.
+             Values: Set by user.
+             */
+            cmdData = [NSString stringWithFormat:@"0x0009 0xB0 0xFD 0xC1 0xA0 0x1E 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_GET_CURRENT_DIST_TO_OBJ:
+        {
+            /*Get*ObjDis: 0xAC ,Get, This command retrieves the current distance to any objects
+             Values: 0x0A-From Front Side, 0x0B-From Rear Side, 0x0C-From Left Side, 0x0D-From Right Side,          */
+            cmdData = [NSString stringWithFormat:@"0x0009 0xB0 0xFD 0xC2 0xA2 0xAC 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_MIN_DIST_TO_OBJ:
+        {
+            /*SetLsObjClr: 0xDE ,Set, This command retrieves the current distance to any objects
+             Values: 0x0E-From Front Side, 0x0F-From Rear Side, 0x10-From Left Side, 0x11-From Right Side,          */
+            cmdData = [NSString stringWithFormat:@"0x0009 0xB0 0xFD 0xC2 0xA1 0xDE 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_ACTION_CAL_ROUTINE_RANGE_SENSOR:
+        {
+            /*CalFtRnSnr: 0xFD ,Action, The command starts the calibration routine for the range sensor. Only in Debug Mode
+             Values: 0x12-From Front Side, 0x13-From Rear Side, 0x14-From Left Side, 0x15-From Right Side,          */
+            cmdData = [NSString stringWithFormat:@"0x0009 0xB0 0xFD 0xC2 0xA3 0xFD 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
+            break;
+        }
+        case CMD_SET_LIGHT_LUX:
+        {
+            /*Lux_Snr_Thres: 0x06 ,Set, This command sets the light sensors lux level
+             Values: 0x00-0xFF*/
+            cmdData = [NSString stringWithFormat:@"0x0009 0xB0 0xFD 0xC2 0xA1 0x06 0x01%@040404 0x01 %@",[self stringToHex:[params valueForKey:@"1"]],[self getcurrentHexTimestamp]];
+            break;
+        }
         default:
             break;
     }
