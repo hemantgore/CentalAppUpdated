@@ -21,11 +21,12 @@ static void (^__commandCompletionBlock)(NSError *error);
      NSMutableArray *_objects;
     NSDateFormatter *dateFormatter;
 }
-@property (strong,    nonatomic)    MelodySmart  *melodySmart;
-@property (strong,    nonatomic)    NSData       *dataToSend;
-@property (nonatomic, readwrite)    NSInteger    sendDataIndex;
-@property (nonatomic, assign)       BOOL         isPowerOn;
-@property (nonatomic, assign,getter=isConnected)       BOOL         connected;
+@property (strong,nonatomic)   MelodySmart  *melodySmart;
+@property (strong,nonatomic)   NSData       *dataToSend;
+@property (nonatomic,readwrite)  NSInteger    sendDataIndex;
+@property (nonatomic,assign)      BOOL         isPowerOn;
+@property (nonatomic,strong)       NSString *lastCommand;
+@property (nonatomic,assign,getter=isConnected)       BOOL         connected;
 @end
 @implementation SmartBLEManager
 #pragma mark - Singleton Methods -
@@ -37,6 +38,9 @@ static void (^__commandCompletionBlock)(NSError *error);
         sharedMyManager = [[self alloc] init];
     });
     return sharedMyManager;
+}
+- (NSString*)lastSentCommand {
+    return _lastCommand;
 }
 - (NSString*)name{
     return self.melodySmart.name
@@ -134,6 +138,9 @@ static void (^__commandCompletionBlock)(NSError *error);
 -(void)melodySmart:(MelodySmart *)melody didReceiveData:(NSData *)data {
     NSString *temp =[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     NSLog(@"didReceivedData::%@",temp);
+    if(self.delegate && [self.delegate conformsToProtocol:@protocol(SmartHelmetDataDelegate)]){
+        [self.delegate dataReceivedFromPeripheral:data];
+    }
     
 }
 - (void)melodySmart:(MelodySmart *)melody didReceiveCommandReply:(NSData *)data {
@@ -170,6 +177,12 @@ static void (^__commandCompletionBlock)(NSError *error);
         __commandCompletionBlock(err);
         return;
     }
+    if(!self.melodySmart.isConnected){
+        NSError *err = [NSError errorWithDomain:@"" code:-1001 userInfo:[NSDictionary dictionaryWithObject:@"Check the Connectivity and try again." forKey:NSLocalizedDescriptionKey]];
+        __commandCompletionBlock(err);
+        return;
+    }
+    
     NSString *cmdData;
     switch (cmd) {
         case CMD_SET_SYS_MAIN_MODE://Main Mode
@@ -593,6 +606,7 @@ static void (^__commandCompletionBlock)(NSError *error);
         default:
             break;
     }
+    _lastCommand = cmdData;
     cmdData = [cmdData stringByReplacingOccurrencesOfString:@" " withString:@""];
 //    cmdData = [NSString stringWithFormat:@"SEND %@",cmdData];
     self.dataToSend = [self dataFromHexString:cmdData];// [cmdData dataUsingEncoding:NSUTF8StringEncoding];

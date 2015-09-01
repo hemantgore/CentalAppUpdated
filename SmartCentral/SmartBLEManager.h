@@ -157,8 +157,17 @@ typedef enum{
     CAL_RIGHT
 }CAL_ROUTINE_SENSOR;
 
-@interface SmartBLEManager : NSObject
+@protocol SmartHelmetDataDelegate <NSObject>
 
+@optional
+- (void)dataReceivedFromPeripheral:(NSData*)data;
+
+@end
+
+@interface SmartBLEManager : NSObject
+{
+    
+}
 + (id)sharedManager;
 - (BOOL)isConnected;
 - (NSString*)name;
@@ -166,4 +175,7 @@ typedef enum{
 - (void)connectToDefaultSmartHelmet:(void(^)(NSError *error))connectBlock;
 - (void)disconnectSmartHelmet:(void(^)(NSError *error))disconnectBlock;
 - (void)sendCommandToHelmet:(CMD_TYPE)cmd params:(NSDictionary*)params completion:(void(^) (NSError *error))cmdCompletion;
+- (NSString*)lastSentCommand;
+@property(nonatomic,assign) id<SmartHelmetDataDelegate>delegate;
 @end
+

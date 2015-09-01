@@ -12,10 +12,11 @@
 
 #define NOTIFY_MTU      20
 
-@interface ViewController () <MelodyManagerDelegate,MelodySmartDelegate,UITextFieldDelegate>{
+@interface ViewController () <MelodyManagerDelegate,MelodySmartDelegate,UITextFieldDelegate,SmartHelmetDataDelegate>{
     MelodyManager *melodyManager;
     NSMutableArray *_objects;
     SmartBLEManager *smartManager;
+    BOOL _rowData;
 }
 @property (weak, nonatomic) IBOutlet UIView *ledBrightnessView;
 @property (weak, nonatomic) IBOutlet UIButton *scanBtn;
@@ -52,12 +53,30 @@
 - (void)viewDidDisappear:(BOOL)animated {
 //    [melodyManager stopScanning];
 }
+- (void)dataReceivedFromPeripheral:(NSData *)data{
+    NSString* temp = nil;
+    if(!_rowData)
+        temp = data?[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]:@"";
+else
+        temp = [[NSString alloc] initWithFormat:@"%@", data];
+
+    if (str == nil) {
+        str = [NSMutableString stringWithFormat:@"ACK: %@\n",temp];
+    } else {
+        [str appendFormat:@"ACK: %@\n",temp];
+    }
+    self.degubInfoTextView.text =str;
+}
 - (void)scan {
     //    [self clearObjects];
     //    [melodyManager scanForMelody];
     //    [self performSelector:@selector(stop) withObject:nil afterDelay:3.0];
     //    [NSTimer scheduledTimerWithTimeInterval:(float)3.2 target:self selector:@selector(connectionTimer:) userInfo:nil repeats:NO];
-    [[SmartBLEManager sharedManager] scanSmartHelmet:^(NSError *error) {
+    
+    smartManager = [SmartBLEManager sharedManager];
+    smartManager.delegate = self;
+    
+    [smartManager scanSmartHelmet:^(NSError *error) {
         if(error){
             
         }else{
@@ -329,73 +348,8 @@ NSTimer *rssiTimer;
     int total =ge +shi;
     return total;
 }
-//- (IBAction)setCyclingMode:(id)sender{
-//    
-//    uint8_t send[] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-//    /*
-//     4.3.1 System Message Format
-//     MSGID|MSGTYP|NODEID|VCSID|CMDTYP||CMD||CMDPKT|PRI|TIMSTMP
-//     */
-//    //    uint8_t send[20];
-//
-//     NSString *hxStr = [self stringToHex:@"SEND"];
-//    send[0] =[hxStr intValue];//[[NSString stringWithFormat:@"%ld", strtoul([@"send" UTF8String],0,16)] intValue];
-//    send[1]=[self decimalIntoHex:1];
-//    send[2]=0xB0;//MSG Type-0xB0:Sys, 0xB1:HW,0xB2:info, 0xB3:ACT
-//    send[3]=0x00;//5 bit, used for H/w msg type: 0xFD
-//    send[4]=0xC3;
-//    send[5]=0xA0;//CMD type, 0xA0:SET, 0xA1:GET, 0xA2:ACT
-//    send[6]=0xA0;//CMD,e,g: SetSysMod:0xEC
-//    send[7]=0x01; // 0x01:Cycling
-//    send[8]=0x01;//Priority: (0x01)in HEX==1 in Decimal
-//    send[9]=[self decimalIntoHex:[[NSDate date] timeIntervalSince1970]];// Get Sencond in since, convert ot HEX
-//    send[10] ='\r';//[self decimalIntoHex:[[NSString stringWithFormat:@"%ld", strtoul([@"\r" UTF8String],0,16)] intValue]];
-//    NSData *data = [[NSData alloc] initWithBytes:send length:11];
-//    if (bleShield.activePeripheral.state == CBPeripheralStateConnected) {
-//        [bleShield write:data];
-//        NSMutableString *temp = [[NSMutableString alloc] init];
-//        for (int i = 0; i < 11; i++) {
-//            
-////            NSString *strTmp = [NSString stringWithFormat:@"%x",send[i]];
-////            if([strTmp length]<2)
-////                [temp appendFormat:@" 0x0%x ", send[i]];
-////            else
-////            if(i==0){
-////                NSString *hexStr = [self ];
-////            }
-//            
-//                [temp appendFormat:@" 0x%0.2hhx ", send[i]];
-//        }
-//        if (str == nil) {
-//            str = [NSMutableString stringWithFormat:@"%@\n", temp];
-//        } else {
-//            [str appendFormat:@"%@\n", temp];
-//        }
-//        self.degubInfoTextView.text =str;
-//    }
-//}
-- (IBAction)setLED:(UISwitch*)sender{
-    
-    uint32_t send[] = {0x00001,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x0000000001};
-    /*
-     4.3.1 System Message Format
-     MSGID|MSGTYP|NODEID|VCSID|CMDTYP||CMD||CMDPKT|PRI|TIMSTMP
-     */
-    //    uint8_t send[20];
-    send[0]=[self decimalIntoHex:1];
-    send[1]=0xB0;//MSG Type-0xB0:Sys, 0xB1:HW,0xB2:info, 0xB3:ACT
-    send[2]=0x00;//5 bit, used for H/w msg type: 0xFD
-    send[3]=0xC3;
-    send[4]=0xA0;//CMD type, 0xA0:SET, 0xA1:GET, 0xA2:ACT
-    send[5]=0xA0;//CMD,e,g: SetSysMod:0xEC
-    send[6]=0x01; // 0x01:Cycling
-    send[7]=0x01;//Priority: (0x01)in HEX==1 in Decimal
-    send[8]=[self decimalIntoHex:[[NSDate date] timeIntervalSince1970]];// Get Sencond in since, convert ot HEX
-    NSData *data = [[NSData alloc] initWithBytes:send length:9];
-    if (bleShield.activePeripheral.state == CBPeripheralStateConnected) {
-        [bleShield write:data];
-    }
-}
+
+
 - (NSString *)stringToHex:(NSString *)stringInput
 {
     NSUInteger len = [stringInput length];
@@ -428,81 +382,24 @@ NSTimer *rssiTimer;
     
     return [[NSString alloc] initWithData:stringData encoding:NSASCIIStringEncoding];
 }
-/*
- NAV_VCS: 0xC0
- ELE_VCS: 0xC1
- IMGP_VCS: 0xC2
- SYSC_VSC: 0xC3
- ---
- NDFRMN_1: 0xFD
- ----
- SYS_MSG: 0xB0
- HDWR_MSG: 0xB1
- INFO_MSG: 0xB2
- ￼ACT_MSG: 0xB3
- --------
- SET: 0xA0
- GET: 0xA1
- ACT: 0xA2
- -----
- 4.3.1 System Message Format
- Sys msg format: MSGID| MSGTYP|￼NODEID|VCSID|CMDTYP|CMD|CMDPKT|￼￼PRI|TIMSTMP
- 
- 4.3.2 Hardware Message Format
- H/w meg format: MSGID|MSGTYP| ￼NODEID|HRWDID|CMDTYPE|CMD|CMDPKT|￼PRI|TIMSTMP
- 
- 4.3.3 Informational Message Format
- MSGID
- MSGTYP
- VCSID
- STATMSG
- PRI
- TIMSTMP
- 
- 4.3.4 Acknowledge Message Format
- MSGID
- MSGTYPE ￼
- ACKTYP
- ￼￼MSGRESP
- PRI
- TIMSTMP
- 
- 
- */
-- (IBAction)getDateNavVCS:(id)sender {
-    /*
-    GetDate:0x0A
-    Desc: This command retrieves the current date for the Navigation VCS
-    Type:  Get
-
-     Sys msg format: MSGID| MSGTYP|￼NODEID|VCSID|CMDTYP|CMD|CMDPKT|￼￼PRI|TIMSTMP
-    */
-    
-    NSString *cmdData = [NSString stringWithFormat:@"SEND 0x0001 0xA1 0xFD 0xC0 0x0A 0x0101040404 0x01%@",[self getcurrentHexTimestamp]];
-    self.dataToSend = [cmdData dataUsingEncoding:NSUTF8StringEncoding];
-    self.commandTextField.text = cmdData;
-    self.sendDataIndex = 0;
-    [self.commandTextField resignFirstResponder];
-    [self sendDataToMelody];
-}
-- (IBAction)setHeadLightON:(id)sender {
-    /*
-     ActHdLit:0x06
-     The command sets the Smart Helmet’s Head Lights on/off option.
-     Head Lights On/Off
-     Type: Set
-     */
-}
-- (IBAction)setHeadLightOFF:(id)sender {
-}
-- (IBAction)setFrontCamModeVideo:(id)sender {
-    /*Set_ftcam_mod: 0x03
-     This command sets the front camera’s mode. This command contains a single parameter which identifies the camera mode.
-         0x01-Stills, 0x02-Video
-    Type: Set
-    */
-}
-- (IBAction)setFrontCamModeStill:(id)sender {
+- (void)updateDebugInfo:(NSError*)error{
+    if(error){
+        
+        if (str == nil) {
+            str = [NSMutableString stringWithFormat:@"%@\n", [error localizedDescription]];
+        }else{
+            [str appendFormat:@"%@\n", [error localizedDescription]];
+        }
+        
+    }else{
+        
+        if (str == nil) {
+            str = [NSMutableString stringWithFormat:@"Sent: %@\n", [[SmartBLEManager sharedManager] lastSentCommand]];
+        }else{
+            [str appendFormat:@"Sent: %@\n", [[SmartBLEManager sharedManager] lastSentCommand]];
+        }
+    }
+    self.degubInfoTextView.text =str;
 }
 //System msgs
 - (IBAction)setSysMode:(id)sender {
@@ -515,21 +412,24 @@ NSTimer *rssiTimer;
             [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_SYS_MAIN_MODE params:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%d",CYCLING] forKey:@"1"] completion:^(NSError *error) {
                 if(error){
                     NSLog(@"CMD_SET_CYCLING_MODE Fail");
+                    
                 }else{
                     NSLog(@"CMD_SET_CYCLING_MODE");
                 }
+                [self updateDebugInfo:error];
             }];
             break;
         }
         case 302://Motosport
         {
 //            cmdData = [NSString stringWithFormat:@"0x0002 0xB0 0xFD 0xC3 0x0A 0xEC 0x0102040404 0x01 %@",[self getcurrentHexTimestamp]];
-            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_SYS_MAIN_MODE params:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%d",WINTERSPORT]forKey:@"1"] completion:^(NSError *error) {
+            [[SmartBLEManager sharedManager] sendCommandToHelmet:CMD_SET_SYS_MAIN_MODE params:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%d",MOTOSPORT]forKey:@"1"] completion:^(NSError *error) {
                 if(error){
                     NSLog(@"CMD_SET_MOTOSPORT_MODE Fail");
                 }else{
                     NSLog(@"CMD_SET_MOTOSPORT_MODE");
                 }
+                [self updateDebugInfo:error];
             }];
             break;
         }
@@ -542,6 +442,7 @@ NSTimer *rssiTimer;
                 }else{
                     NSLog(@"CMD_SET_WINTERSPORT_MODE");
                 }
+                [self updateDebugInfo:error];
             }];
             break;
         }
@@ -554,6 +455,7 @@ NSTimer *rssiTimer;
                 }else{
                     NSLog(@"CMD_SET_LONGBOARDING_MODE");
                 }
+                [self updateDebugInfo:error];
             }];
             break;
         }
@@ -566,6 +468,7 @@ NSTimer *rssiTimer;
                 }else{
                     NSLog(@"CMD_SET_DEBUG_MODE");
                 }
+                [self updateDebugInfo:error];
             }];
             break;
         }
@@ -578,6 +481,7 @@ NSTimer *rssiTimer;
                 }else{
                     NSLog(@"CMD_SET_STUNT_MODE");
                 }
+                [self updateDebugInfo:error];
             }];
             break;
         }
@@ -590,6 +494,7 @@ NSTimer *rssiTimer;
                 }else{
                     NSLog(@"CMD_SET_RACE_MODE");
                 }
+                [self updateDebugInfo:error];
             }];
             break;
         }
@@ -602,6 +507,7 @@ NSTimer *rssiTimer;
                 }else{
                     NSLog(@"CMD_SET_COMMUTE_MODE");
                 }
+                [self updateDebugInfo:error];
             }];
             break;
         }
@@ -751,7 +657,12 @@ NSTimer *rssiTimer;
         }else{
             NSLog(@"CMD_SET_LED_BRIGHTNESS");
         }
+        [self updateDebugInfo:error];
     }];
+}
+- (IBAction)rawDataMode:(id)sender {
+    UISwitch *rawD = (UISwitch*)sender;
+    _rowData = rawD.isOn;
 }
 
 @end
